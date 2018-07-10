@@ -13,4 +13,8 @@ conan_cmake_run(CONANFILE conanfile.txt
         BUILD_TYPE "None"
         BUILD outdated)
 
-add_executable(nexus_json_cpp main.cpp)
+set(src_files
+    src/NexusWriteCommandBuilder.cpp
+    src/NexusWriteCommandBuilder.h)
+
+add_executable(nexus_json_cpp src/main.cpp ${src_files})
