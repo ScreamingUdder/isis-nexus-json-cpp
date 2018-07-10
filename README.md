@@ -17,4 +17,4 @@ make
 ```
 and then run with
 ```
-./bin/nexus_json-cmake
+./bin/nexus_json_cmake
