@@ -878,41 +878,51 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
                                           uint32_t spectrumIndex) {
   const std::string monitorName = "monitor_" + std::to_string(monitorNumber);
   // clang-format off
-  json monitor =
-  {
-    "attributes", {
-      {
-        "name", "NX_class",
-        "values", "NXmonitor"
-      }
-    },
-      "children", {
-      {
-        "dataset", {
-                     "type", "int32"
-                   },
-        "type", "dataset",
-        "name", "monitor_number",
-        "values", monitorNumber
-      },
-      {
-        "children", {},
-        "type", "group",
-        "name", "period_index"
-      },
-      {
-        "dataset", {
-                     "type", "int32"
-                   },
-        "type", "dataset",
-        "name", "spectrum_index",
-        "values", spectrumIndex
-      }
-    },
-      "type", "group",
-      "name", monitorName
-  };
+  json monitor = R"(
+    {
+      "attributes": [
+        {
+          "name": "NX_class",
+          "values": "NXmonitor"
+        }
+      ],
+      "children": [
+        {
+          "dataset": {
+            "type": "int32"
+          },
+          "type": "dataset",
+          "name": "monitor_number",
+          "values": 8
+        },
+        {
+          "children": [],
+          "type": "group",
+          "name": "period_index"
+        },
+        {
+          "dataset": {
+            "type": "int32"
+          },
+          "type": "dataset",
+          "name": "spectrum_index",
+          "values": 8
+        }
+      ],
+      "type": "group",
+      "name": "MONITOR_NAME"
+    })"_json;
   // clang-format on
+
+  monitor["name"] = monitorName;
+  for (auto &child : monitor["children"]) {
+    if (child["name"] == "spectrum_index") {
+      child["values"] = spectrumIndex;
+    } else if (child["name"] == "monitor_number") {
+      child["values"] = monitorNumber;
+    }
+  }
+
   m_startMessageJson["nexus_structure"]["children"].push_back(monitor);
 }
 
