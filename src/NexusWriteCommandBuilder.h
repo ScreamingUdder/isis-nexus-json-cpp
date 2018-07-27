@@ -4,10 +4,10 @@
 
 class NexusWriteCommandBuilder {
 public:
-  NexusWriteCommandBuilder(
-      const std::string &instrumentName, const std::string &filename,
-      const std::string &jobID,
-      const std::string &broker = "livedata.isis.cclrc.ac.uk");
+  NexusWriteCommandBuilder(const std::string &instrumentName,
+                           const std::string &filename,
+                           const std::string &jobID, const std::string &broker,
+                           const std::string &runCycle);
   std::string startMessageAsString();
   std::string stopMessageAsString();
   void addSampleEnvLog(const std::string &name);
@@ -18,6 +18,7 @@ private:
                             const std::string &filename,
                             const std::string &instrumentName);
   void addInstrument(const std::string &instrumentNameStr);
+  void addRunCycle(const std::string &runCycleStr);
 
   nlohmann::json
   createInstrumentNameJson(const std::string &instrumentNameStr) const;

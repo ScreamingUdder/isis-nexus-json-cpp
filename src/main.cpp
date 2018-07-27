@@ -1,14 +1,19 @@
 #include "NexusWriteCommandBuilder.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 int main() {
   const std::string instrumentName = "ZOOM";
   const std::string filename = "ZOOM_782582.nxs";
   // jobID must match in start and stop message
-  // It must be unique (could be generated UUID or instrument name and run number)
+  // It must be unique (could be generated UUID or instrument name and run
+  // number)
   const std::string jobID = "ZOOM_782582";
-  NexusWriteCommandBuilder commandBuilder(instrumentName, filename, jobID);
+  const std::string broker = "livedata.isis.cclrc.ac.uk";
+  const std::string runCycle = "18_2";
+
+  NexusWriteCommandBuilder commandBuilder(instrumentName, filename, jobID,
+                                          broker, runCycle);
 
   // TODO Add detector
 

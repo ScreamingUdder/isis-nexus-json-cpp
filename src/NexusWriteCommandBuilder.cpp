@@ -4,9 +4,11 @@ using json = nlohmann::json;
 
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const std::string &filename,
-    const std::string &jobID, const std::string &broker)
+    const std::string &jobID, const std::string &broker,
+    const std::string &runCycle)
     : m_jobID(jobID) {
   initStartMessageJson(broker, filename, instrumentName);
+  addRunCycle(runCycle);
   addInstrument(instrumentName);
 }
 
@@ -474,14 +476,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             },
             {
               "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "run_cycle",
-              "values": "18_1"
-            },
-            {
-              "dataset": {
                 "type": "int32"
               },
               "type": "dataset",
@@ -714,11 +708,11 @@ void NexusWriteCommandBuilder::initStartMessageJson(
         }
       ]
     },
-    "broker": "BROKER",
+    "broker": "PLACEHOLDER",
     "cmd": "FileWriter_new",
-    "job_id": "JOBID",
+    "job_id": "PLACEHOLDER",
     "file_attributes": {
-      "file_name": "FILENAME"
+      "file_name": "PLACEHOLDER"
     }
   })"_json;
   // clang-format on
@@ -749,6 +743,25 @@ json NexusWriteCommandBuilder::createBeamlineJson(
 
   beamline["values"] = beamlineName;
   return beamline;
+}
+
+void NexusWriteCommandBuilder::addRunCycle(const std::string &runCycleStr) {
+  // clang-format off
+  auto runCycle = R"(
+    {
+      "dataset": {
+        "type": "string"
+      },
+      "type": "dataset",
+      "name": "run_cycle",
+      "values": "PLACEHOLDER"
+    }
+  )"_json;
+  // clang-format on
+
+  runCycle["values"] = runCycleStr;
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      runCycle);
 }
 
 void NexusWriteCommandBuilder::addInstrument(
