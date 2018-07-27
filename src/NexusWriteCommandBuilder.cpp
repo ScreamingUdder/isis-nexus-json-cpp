@@ -259,82 +259,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "name": "measurement"
             },
             {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXsample"
-                }
-              ],
-              "children": [
-                {
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "height",
-                  "values": 6.0
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "shape",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "name",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "double"
-                  },
-                  "type": "dataset",
-                  "name": "distance",
-                  "values": 0.0
-                },
-                {
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "thickness",
-                  "values": 1.0
-                },
-                {
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "width",
-                  "values": 6.0
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "type",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "id",
-                  "values": " "
-                }
-              ],
-              "type": "group",
-              "name": "sample"
-            },
-            {
               "dataset": {
                 "type": "string"
               },
@@ -728,40 +652,85 @@ void NexusWriteCommandBuilder::initStartMessageJson(
 
 json NexusWriteCommandBuilder::createBeamlineJson(
     const std::string &beamlineName) const {
-  // clang-format off
-  auto beamline = R"(
-    {
-      "dataset": {
-        "type": "string"
-      },
-      "type": "dataset",
-      "name": "beamline",
-      "values": "PLACEHOLDER"
-    }
-  )"_json;
-  // clang-format on
-
-  beamline["values"] = beamlineName;
-  return beamline;
+  return createSimpleDataset<std::string>("beamline", "string", beamlineName);
 }
 
 void NexusWriteCommandBuilder::addRunCycle(const std::string &runCycleStr) {
+  auto runCycle =
+      createSimpleDataset<std::string>("run_cycle", "string", runCycleStr);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      runCycle);
+}
+
+void NexusWriteCommandBuilder::addSample(float height, float thickness,
+                                         float width, double distance,
+                                         const std::string &shape,
+                                         const std::string &name,
+                                         const std::string &type,
+                                         const std::string &id) {
   // clang-format off
-  auto runCycle = R"(
+  auto sample = R"(
+    {
+      "attributes": [
+        {
+          "name": "NX_class",
+          "values": "NXsample"
+        }
+      ],
+      "children": [
+      ],
+      "type": "group",
+      "name": "sample"
+    }
+  )"_json;
+  // clang-format on
+
+  sample["children"].push_back(
+      createSimpleDataset<float>("height", "float", height));
+  sample["children"].push_back(
+      createSimpleDataset<float>("thickness", "float", thickness));
+  sample["children"].push_back(
+      createSimpleDataset<float>("width", "float", width));
+  sample["children"].push_back(
+      createSimpleDataset<std::string>("shape", "string", shape));
+  sample["children"].push_back(
+      createSimpleDataset<std::string>("name", "string", name));
+  sample["children"].push_back(
+      createSimpleDataset<double>("distance", "string", distance));
+  sample["children"].push_back(
+      createSimpleDataset<std::string>("type", "string", type));
+  sample["children"].push_back(
+      createSimpleDataset<std::string>("id", "string", id));
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      sample);
+}
+
+template <typename T>
+json NexusWriteCommandBuilder::createSimpleDataset(const std::string &name,
+                                                   const std::string &typeStr,
+                                                   T value) const {
+  // clang-format off
+  auto dataset = R"(
     {
       "dataset": {
-        "type": "string"
+        "type": "PLACEHOLDER"
       },
       "type": "dataset",
-      "name": "run_cycle",
+      "name": "PLACEHOLDER",
       "values": "PLACEHOLDER"
     }
   )"_json;
   // clang-format on
 
-  runCycle["values"] = runCycleStr;
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      runCycle);
+  std::stringstream strStream;
+  strStream << value;
+  dataset["values"] = strStream.str();
+
+  dataset["name"] = name;
+  dataset["dataset"]["type"] = typeStr;
+
+  return dataset;
 }
 
 void NexusWriteCommandBuilder::addInstrument(

@@ -12,6 +12,10 @@ public:
   std::string stopMessageAsString();
   void addSampleEnvLog(const std::string &name);
   void addMonitor(uint32_t monitorNumber, uint32_t spectrumNumber);
+  void addSample(float height, float thickness, float width,
+                 double distance = 0.0, const std::string &shape = "",
+                 const std::string &name = "", const std::string &type = "",
+                 const std::string &id = "");
 
 private:
   void initStartMessageJson(const std::string &broker,
@@ -20,6 +24,9 @@ private:
   void addInstrument(const std::string &instrumentNameStr);
   void addRunCycle(const std::string &runCycleStr);
 
+  template <typename T>
+  nlohmann::json createSimpleDataset(const std::string &name,
+                                     const std::string &typeStr, T value) const;
   nlohmann::json
   createInstrumentNameJson(const std::string &instrumentNameStr) const;
   nlohmann::json createBeamlineJson(const std::string &beamlineName) const;

@@ -15,6 +15,8 @@ int main() {
   NexusWriteCommandBuilder commandBuilder(instrumentName, filename, jobID,
                                           broker, runCycle);
 
+  commandBuilder.addSample(6.0, 1.0, 6.0);
+
   // TODO Add detector
 
   // TODO Add event data
