@@ -15,7 +15,13 @@ public:
 
 private:
   void initStartMessageJson(const std::string &broker,
-                            const std::string &filename);
+                            const std::string &filename,
+                            const std::string &instrumentName);
+  void addInstrument(const std::string &instrumentNameStr);
+
+  nlohmann::json
+  createInstrumentNameJson(const std::string &instrumentNameStr) const;
+  nlohmann::json createBeamlineJson(const std::string &beamlineName) const;
 
   const std::string m_jobID;
   nlohmann::json m_startMessageJson;

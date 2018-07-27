@@ -6,11 +6,13 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const std::string &filename,
     const std::string &jobID, const std::string &broker)
     : m_jobID(jobID) {
-  initStartMessageJson(broker, filename);
+  initStartMessageJson(broker, filename, instrumentName);
+  addInstrument(instrumentName);
 }
 
 void NexusWriteCommandBuilder::initStartMessageJson(
-    const std::string &broker, const std::string &filename) {
+    const std::string &broker, const std::string &filename,
+    const std::string &instrumentName) {
   // clang-format off
   m_startMessageJson = R"({
     "nexus_structure": {
@@ -44,133 +46,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "title",
               "values": "MT Beam A2=6mm SANS"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXinstrument"
-                }
-              ],
-              "children": [
-                {
-                  "attributes": [
-                    {
-                      "name": "NX_class",
-                      "values": "NXmoderator"
-                    }
-                  ],
-                  "children": [
-                    {
-                      "attributes": [
-                        {
-                          "name": "units",
-                          "values": "metre"
-                        }
-                      ],
-                      "dataset": {
-                        "type": "float"
-                      },
-                      "type": "dataset",
-                      "name": "distance",
-                      "values": -0.0
-                    }
-                  ],
-                  "type": "group",
-                  "name": "moderator"
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "NX_class",
-                      "values": "NXdetector"
-                    }
-                  ],
-                  "children": [
-                    {
-                      "dataset": {
-                        "type": "float"
-                      },
-                      "type": "dataset",
-                      "name": "source_detector_distance",
-                      "values": 0.0
-                    },
-                    {
-                      "attributes": [
-                        {
-                          "name": "target",
-                          "values": "/raw_data_1/instrument/detector_1/total_counts"
-                        }
-                      ],
-                      "dataset": {
-                        "type": "uint64"
-                      },
-                      "type": "dataset",
-                      "name": "total_counts",
-                      "values": 170700
-                    },
-                    {
-                      "children": [],
-                      "type": "group",
-                      "name": "period_index"
-                    }
-                  ],
-                  "type": "group",
-                  "name": "detector_1"
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "short_name",
-                      "values": "ZOO"
-                    }
-                  ],
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "name",
-                  "values": "ZOOM"
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "NX_class",
-                      "values": "NXsource"
-                    }
-                  ],
-                  "children": [
-                    {
-                      "dataset": {
-                        "type": "string"
-                      },
-                      "type": "dataset",
-                      "name": "probe",
-                      "values": "neutrons"
-                    },
-                    {
-                      "dataset": {
-                        "type": "string"
-                      },
-                      "type": "dataset",
-                      "name": "type",
-                      "values": "Pulsed Neutron Source"
-                    },
-                    {
-                      "dataset": {
-                        "type": "string"
-                      },
-                      "type": "dataset",
-                      "name": "name",
-                      "values": "ISIS"
-                    }
-                  ],
-                  "type": "group",
-                  "name": "source"
-                }
-              ],
-              "type": "group",
-              "name": "instrument"
             },
             {
               "attributes": [
@@ -482,20 +357,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             {
               "attributes": [
                 {
-                  "name": "short_name",
-                  "values": "ZOO"
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "name",
-              "values": "ZOOM"
-            },
-            {
-              "attributes": [
-                {
                   "name": "version",
                   "values": "SVN R1959 (2018/06/13 13:15:08, Mixed revision WC 1958:1959, Modified) "
                 }
@@ -532,14 +393,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "experiment_identifier",
               "values": "0"
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "beamline",
-              "values": "ZOOM"
             },
             {
               "dataset": {
@@ -872,6 +725,169 @@ void NexusWriteCommandBuilder::initStartMessageJson(
   m_startMessageJson["broker"] = broker;
   m_startMessageJson["job_id"] = m_jobID;
   m_startMessageJson["file_attributes"]["file_name"] = filename;
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createInstrumentNameJson(instrumentName));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createBeamlineJson(instrumentName));
+}
+
+json NexusWriteCommandBuilder::createBeamlineJson(
+    const std::string &beamlineName) const {
+  // clang-format off
+  auto beamline = R"(
+    {
+      "dataset": {
+        "type": "string"
+      },
+      "type": "dataset",
+      "name": "beamline",
+      "values": "PLACEHOLDER"
+    }
+  )"_json;
+  // clang-format on
+
+  beamline["values"] = beamlineName;
+  return beamline;
+}
+
+void NexusWriteCommandBuilder::addInstrument(
+    const std::string &instrumentNameStr) {
+  // clang-format off
+  auto instrument = R"(
+    {
+      "attributes": [
+        {
+          "name": "NX_class",
+          "values": "NXinstrument"
+        }
+      ],
+      "children": [
+        {
+          "attributes": [
+            {
+              "name": "NX_class",
+              "values": "NXmoderator"
+            }
+          ],
+          "children": [
+            {
+              "attributes": [
+                {
+                  "name": "units",
+                  "values": "metre"
+                }
+              ],
+              "dataset": {
+                "type": "float"
+              },
+              "type": "dataset",
+              "name": "distance",
+              "values": -0.0
+            }
+          ],
+          "type": "group",
+          "name": "moderator"
+        },
+        {
+          "attributes": [
+            {
+              "name": "NX_class",
+              "values": "NXdetector"
+            }
+          ],
+          "children": [
+            {
+              "dataset": {
+                "type": "float"
+              },
+              "type": "dataset",
+              "name": "source_detector_distance",
+              "values": 0.0
+            },
+            {
+              "children": [],
+              "type": "group",
+              "name": "period_index"
+            }
+          ],
+          "type": "group",
+          "name": "detector_1"
+        },
+        {
+          "attributes": [
+            {
+              "name": "NX_class",
+              "values": "NXsource"
+            }
+          ],
+          "children": [
+            {
+              "dataset": {
+                "type": "string"
+              },
+              "type": "dataset",
+              "name": "probe",
+              "values": "neutrons"
+            },
+            {
+              "dataset": {
+                "type": "string"
+              },
+              "type": "dataset",
+              "name": "type",
+              "values": "Pulsed Neutron Source"
+            },
+            {
+              "dataset": {
+                "type": "string"
+              },
+              "type": "dataset",
+              "name": "name",
+              "values": "ISIS"
+            }
+          ],
+          "type": "group",
+          "name": "source"
+        }
+      ],
+      "type": "group",
+      "name": "instrument"
+    }
+  )"_json;
+  // clang-format on
+
+  instrument["children"].push_back(createInstrumentNameJson(instrumentNameStr));
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      instrument);
+}
+
+json NexusWriteCommandBuilder::createInstrumentNameJson(
+    const std::string &instrumentNameStr) const {
+  // clang-format off
+  auto instrumentName = R"(
+  {
+    "attributes": [
+      {
+        "name": "short_name",
+        "values": "PLACEHOLDER"
+      }
+    ],
+    "dataset": {
+      "type": "string"
+    },
+    "type": "dataset",
+    "name": "name",
+    "values": "PLACEHOLDER"
+  }
+  )"_json;
+  // clang-format on
+
+  instrumentName["values"] = instrumentNameStr;
+  instrumentName["attributes"][0]["values"] = instrumentNameStr.substr(0, 3);
+
+  return instrumentName;
 }
 
 void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
@@ -910,7 +926,7 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
         }
       ],
       "type": "group",
-      "name": "MONITOR_NAME"
+      "name": "PLACEHOLDER"
     })"_json;
   // clang-format on
 
@@ -923,16 +939,17 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
     }
   }
 
-  m_startMessageJson["nexus_structure"]["children"].push_back(monitor);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      monitor);
 }
 
 void NexusWriteCommandBuilder::addSampleEnvLog(const std::string &name) {}
 
 std::string NexusWriteCommandBuilder::startMessageAsString() {
-  return m_startMessageJson.dump();
+  return m_startMessageJson.dump(4);
 }
 
 std::string NexusWriteCommandBuilder::stopMessageAsString() {
   json stopMessageJson = {{"job_id", m_jobID}, {"cmd", "FileWriter_stop"}};
-  return stopMessageJson.dump();
+  return stopMessageJson.dump(4);
 }
