@@ -53,7 +53,7 @@ private:
                                const std::vector<Attribute> &attributes = {});
 
   nlohmann::json createGroup(const std::string &name,
-                             const std::vector<Attribute> &attributes);
+                             const std::vector<Attribute> &attributes = {});
 
   nlohmann::json createNode(const std::string &name, NodeType nodeType,
                             const std::vector<Attribute> &attributes) const;

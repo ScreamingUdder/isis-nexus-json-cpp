@@ -864,54 +864,16 @@ json NexusWriteCommandBuilder::createInstrumentNameJson(
 void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
                                           uint32_t spectrumIndex) {
   const std::string monitorName = "monitor_" + std::to_string(monitorNumber);
-  // clang-format off
-  json monitor = R"(
-    {
-      "attributes": [
-        {
-          "name": "NX_class",
-          "values": "NXmonitor"
-        }
-      ],
-      "children": [
-        {
-          "dataset": {
-            "type": "int32"
-          },
-          "type": "dataset",
-          "name": "monitor_number",
-          "values": 8
-        },
-        {
-          "children": [],
-          "type": "group",
-          "name": "period_index"
-        },
-        {
-          "dataset": {
-            "type": "int32"
-          },
-          "type": "dataset",
-          "name": "spectrum_index",
-          "values": 8
-        }
-      ],
-      "type": "group",
-      "name": "PLACEHOLDER"
-    })"_json;
-  // clang-format on
 
-  monitor["name"] = monitorName;
-  for (auto &child : monitor["children"]) {
-    if (child["name"] == "spectrum_index") {
-      child["values"] = spectrumIndex;
-    } else if (child["name"] == "monitor_number") {
-      child["values"] = monitorNumber;
-    }
-  }
+  auto monitorGroup = createGroup(monitorName, {{"NX_class", "NXmonitor"}});
+  monitorGroup["children"].push_back(
+      createDataset<int32_t>("monitor_number", "int32", monitorNumber));
+  monitorGroup["children"].push_back(
+      createDataset<int32_t>("spectrum_index", "int32", spectrumIndex));
+  monitorGroup["children"].push_back(createGroup("period_index"));
 
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      monitor);
+      monitorGroup);
 }
 
 void NexusWriteCommandBuilder::addSampleEnvLog(const std::string &name) {}
