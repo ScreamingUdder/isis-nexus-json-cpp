@@ -33,6 +33,12 @@ void NexusWriteCommandBuilder::addTotalCounts(uint64_t totalCounts) {
       dataset);
 }
 
+void NexusWriteCommandBuilder::addMonitorEventsNotSaved(int64_t monitorEventsNotSaved) {
+  auto dataset = createDataset<int64_t>("monitor_events_not_saved", "int64", monitorEventsNotSaved);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {

@@ -32,6 +32,7 @@ public:
   void addStartTime(const std::string &startTimeIso8601);
   void addTitle(const std::string &title);
   void addTotalCounts(uint64_t totalCounts);
+  void addMonitorEventsNotSaved(int64_t monitorEventsNotSaved);
 
 private:
   void initStartMessageJson(const std::string &broker,
