@@ -24,6 +24,9 @@ int main() {
   commandBuilder.addProgramName(
       "ISISICP.EXE",
       "SVN R1959 (2018/06/13 13:15:08, Mixed revision WC 1958:1959, Modified)");
+  commandBuilder.addNexusDefinition(
+      "TOFRAW", "1.0",
+      "http://definition.nexusformat.org/instruments/TOFRAW?version=1.0");
 
   // Add some users
   commandBuilder.addUser("Alice", "The Unseen University");

@@ -80,6 +80,15 @@ void NexusWriteCommandBuilder::addProgramName(const std::string &programName,
       dataset);
 }
 
+void NexusWriteCommandBuilder::addNexusDefinition(const std::string &name,
+                                                  const std::string &version,
+                                                  const std::string &url) {
+  auto dataset = createDataset<std::string>(
+      "definition", "string", name, {{"version", version}, {"url", url}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addCollectionTime(
     float collectionTimeInSeconds) {
   auto dataset =
@@ -204,24 +213,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "selog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "version",
-                  "values": "1.0"
-                },
-                {
-                  "name": "url",
-                  "values": "http://definition.nexusformat.org/instruments/TOFRAW?version=1.0"
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "definition",
-              "values": "TOFRAW"
             },
             {
               "dataset": {
