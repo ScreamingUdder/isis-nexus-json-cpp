@@ -23,11 +23,9 @@ void NexusWriteCommandBuilder::addStartTime(
       dataset);
 }
 
-void NexusWriteCommandBuilder::addEndTime(
-    const std::string &endTimeIso8601) {
-  auto dataset =
-      createDataset<std::string>("end_time", "string", endTimeIso8601,
-                                 {Attribute{"units", "ISO8601"}});
+void NexusWriteCommandBuilder::addEndTime(const std::string &endTimeIso8601) {
+  auto dataset = createDataset<std::string>(
+      "end_time", "string", endTimeIso8601, {Attribute{"units", "ISO8601"}});
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
@@ -66,23 +64,9 @@ void NexusWriteCommandBuilder::addRunNumber(const int32_t runNumber) {
       dataset);
 }
 
-void NexusWriteCommandBuilder::addMeasurementLabel(
-    const std::string &measurementLabel) {
-  auto dataset =
-      createDataset<std::string>("title", "string", measurementLabel);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
-}
-
-void NexusWriteCommandBuilder::addMeasurementID(
-    const std::string &measurementID) {
-  auto dataset = createDataset<std::string>("title", "string", measurementID);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
-}
-
 void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
-  auto dataset = createDataset<std::string>("title", "string", SeciConfig);
+  auto dataset =
+      createDataset<std::string>("seci_config", "string", SeciConfig);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
@@ -114,6 +98,38 @@ void NexusWriteCommandBuilder::addDetector(uint32_t detectorNumber,
       node["children"].push_back(detectorGroup);
     }
   }
+}
+
+void NexusWriteCommandBuilder::addMeasurement(const std::string &label,
+                                              const std::string &id,
+                                              const std::string &subId,
+                                              const std::string &type,
+                                              int32_t firstRun) {
+  auto measurementGroup =
+      createGroup("measurement", {{"NX_class", "NXcollection"}});
+  measurementGroup["children"].push_back(
+      createDataset<std::string>("id", "string", id));
+  measurementGroup["children"].push_back(
+      createDataset<std::string>("subid", "string", subId));
+  measurementGroup["children"].push_back(
+      createDataset<std::string>("type", "string", type));
+  measurementGroup["children"].push_back(
+      createDataset<std::string>("label", "string", label));
+  measurementGroup["children"].push_back(
+      createDataset<int32_t>("label", "int32", firstRun));
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      measurementGroup);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<std::string>("measurement_label", "string", label));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<std::string>("measurement_id", "string", id));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<std::string>("measurement_subid", "string", subId));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<std::string>("measurement_type", "string", type));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<int32_t>("measurement_first_run", "int32", firstRun));
 }
 
 void NexusWriteCommandBuilder::initStartMessageJson(
@@ -193,66 +209,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             {
               "attributes": [
                 {
-                  "name": "NX_class",
-                  "values": "NXcollection"
-                }
-              ],
-              "children": [
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "id",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "type",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "label",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "subid",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "first_run",
-                  "values": 0
-                }
-              ],
-              "type": "group",
-              "name": "measurement"
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "measurement_subid",
-              "values": " "
-            },
-            {
-              "attributes": [
-                {
                   "name": "units",
                   "values": "second"
                 }
@@ -311,22 +267,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "good_frames",
               "values": 18234
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "measurement_type",
-              "values": " "
-            },
-            {
-              "dataset": {
-                "type": "int32"
-              },
-              "type": "dataset",
-              "name": "measurement_first_run",
-              "values": 0
             },
             {
               "dataset": {

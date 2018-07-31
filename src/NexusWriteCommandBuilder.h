@@ -35,10 +35,11 @@ public:
   void addTotalCounts(uint64_t totalCounts);
   void addMonitorEventsNotSaved(int64_t monitorEventsNotSaved);
   void addTotalUncountedCounts(int32_t uncountedCounts);
-  void addMeasurementLabel(const std::string &measurementLabel);
-  void addMeasurementID(const std::string &measurementID);
   void addSeciConfig(const std::string &SeciConfig);
   void addDetector(uint32_t detectorNumber, float sourceDetectorDistance);
+  void addMeasurement(const std::string &label = "", const std::string &id = "",
+                      const std::string &subId = "",
+                      const std::string &type = "", int32_t firstRun = 0);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
