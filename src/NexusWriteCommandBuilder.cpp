@@ -23,6 +23,15 @@ void NexusWriteCommandBuilder::addStartTime(
       dataset);
 }
 
+void NexusWriteCommandBuilder::addEndTime(
+    const std::string &endTimeIso8601) {
+  auto dataset =
+      createDataset<std::string>("end_time", "string", endTimeIso8601,
+                                 {Attribute{"units", "ISO8601"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addTitle(const std::string &title) {
   auto dataset = createDataset<std::string>("title", "string", title);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
@@ -180,20 +189,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "detector_1"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "ISO8601"
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "end_time",
-              "values": "2018-07-06T10:18:21"
             },
             {
               "attributes": [
