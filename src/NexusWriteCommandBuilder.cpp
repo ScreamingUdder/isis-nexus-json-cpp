@@ -27,6 +27,12 @@ void NexusWriteCommandBuilder::addTitle(const std::string &title) {
       dataset);
 }
 
+void NexusWriteCommandBuilder::addTotalCounts(uint64_t totalCounts) {
+  auto dataset = createDataset<uint64_t>("total_counts", "uint64", totalCounts);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -62,14 +68,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "selog"
-            },
-            {
-              "dataset": {
-                "type": "uint64"
-              },
-              "type": "dataset",
-              "name": "total_counts",
-              "values": 170700
             },
             {
               "attributes": [

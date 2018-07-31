@@ -31,6 +31,7 @@ public:
                  const std::string &id = "");
   void addStartTime(const std::string &startTimeIso8601);
   void addTitle(const std::string &title);
+  void addTotalCounts(uint64_t totalCounts);
 
 private:
   void initStartMessageJson(const std::string &broker,
