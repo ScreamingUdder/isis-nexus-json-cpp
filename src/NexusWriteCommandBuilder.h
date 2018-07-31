@@ -2,6 +2,15 @@
 
 #include <nlohmann/json.hpp>
 
+namespace {
+
+struct Attribute {
+  std::string name;
+  std::string value;
+};
+
+}
+
 class NexusWriteCommandBuilder {
 public:
   NexusWriteCommandBuilder(const std::string &instrumentName,
@@ -25,8 +34,13 @@ private:
   void addRunCycle(const std::string &runCycleStr);
 
   template <typename T>
-  nlohmann::json createSimpleDataset(const std::string &name,
-                                     const std::string &typeStr, T value) const;
+  nlohmann::json createDataset(const std::string &name,
+                               const std::string &typeStr, T value) const;
+  template <typename T>
+  nlohmann::json createDataset(
+      const std::string &name, const std::string &typeStr, T value,
+      const std::vector<Attribute> &attributes) const;
+
   nlohmann::json
   createInstrumentNameJson(const std::string &instrumentNameStr) const;
   nlohmann::json createBeamlineJson(const std::string &beamlineName) const;

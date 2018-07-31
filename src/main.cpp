@@ -4,11 +4,14 @@
 
 int main() {
   const std::string instrumentName = "ZOOM";
-  const std::string filename = "ZOOM_782582.nxs";
+  const uint32_t runNumber = 782582;
+
   // jobID must match in start and stop message
   // It must be unique (could be generated UUID or instrument name and run
   // number)
-  const std::string jobID = "ZOOM_782582";
+  const std::string jobID = instrumentName + "_" + std::to_string(runNumber);
+
+  const std::string filename = instrumentName + "_" + std::to_string(runNumber) + ".nxs";
   const std::string broker = "livedata.isis.cclrc.ac.uk";
   const std::string runCycle = "18_2";
 
@@ -20,6 +23,8 @@ int main() {
   // TODO Add detector
 
   // TODO Add event data
+
+  // TODO Add PV (take vector of PV names)
 
   // Add 8 monitors
   for (uint32_t monitorNumber = 1; monitorNumber <= 8; monitorNumber++) {

@@ -652,12 +652,12 @@ void NexusWriteCommandBuilder::initStartMessageJson(
 
 json NexusWriteCommandBuilder::createBeamlineJson(
     const std::string &beamlineName) const {
-  return createSimpleDataset<std::string>("beamline", "string", beamlineName);
+  return createDataset<std::string>("beamline", "string", beamlineName);
 }
 
 void NexusWriteCommandBuilder::addRunCycle(const std::string &runCycleStr) {
   auto runCycle =
-      createSimpleDataset<std::string>("run_cycle", "string", runCycleStr);
+      createDataset<std::string>("run_cycle", "string", runCycleStr);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       runCycle);
 }
@@ -685,31 +685,28 @@ void NexusWriteCommandBuilder::addSample(float height, float thickness,
   )"_json;
   // clang-format on
 
+  sample["children"].push_back(createDataset<float>("height", "float", height));
   sample["children"].push_back(
-      createSimpleDataset<float>("height", "float", height));
+      createDataset<float>("thickness", "float", thickness));
+  sample["children"].push_back(createDataset<float>("width", "float", width));
   sample["children"].push_back(
-      createSimpleDataset<float>("thickness", "float", thickness));
+      createDataset<std::string>("shape", "string", shape));
   sample["children"].push_back(
-      createSimpleDataset<float>("width", "float", width));
+      createDataset<std::string>("name", "string", name));
   sample["children"].push_back(
-      createSimpleDataset<std::string>("shape", "string", shape));
+      createDataset<double>("distance", "string", distance));
   sample["children"].push_back(
-      createSimpleDataset<std::string>("name", "string", name));
-  sample["children"].push_back(
-      createSimpleDataset<double>("distance", "string", distance));
-  sample["children"].push_back(
-      createSimpleDataset<std::string>("type", "string", type));
-  sample["children"].push_back(
-      createSimpleDataset<std::string>("id", "string", id));
+      createDataset<std::string>("type", "string", type));
+  sample["children"].push_back(createDataset<std::string>("id", "string", id));
 
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       sample);
 }
 
 template <typename T>
-json NexusWriteCommandBuilder::createSimpleDataset(const std::string &name,
-                                                   const std::string &typeStr,
-                                                   T value) const {
+json NexusWriteCommandBuilder::createDataset(const std::string &name,
+                                             const std::string &typeStr,
+                                             T value) const {
   // clang-format off
   auto dataset = R"(
     {
@@ -731,6 +728,18 @@ json NexusWriteCommandBuilder::createSimpleDataset(const std::string &name,
   dataset["dataset"]["type"] = typeStr;
 
   return dataset;
+}
+
+template <typename T>
+json NexusWriteCommandBuilder::createDataset(
+    const std::string &name, const std::string &typeStr, T value,
+    const std::vector<Attribute> &attributes) const {
+  auto dataset = createDataset<T>(name, typeStr, value);
+  dataset["attributes"] = {};
+  for (const auto &attribute : attributes) {
+    dataset["attributes"].push_back(
+        {{"name", attribute.name}, {"values", attribute.value}});
+  }
 }
 
 void NexusWriteCommandBuilder::addInstrument(
