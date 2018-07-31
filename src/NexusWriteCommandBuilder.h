@@ -8,14 +8,12 @@ struct Attribute {
   const std::string name;
   const std::string value;
 };
-
 }
 
 class NexusWriteCommandBuilder {
 public:
   NexusWriteCommandBuilder(const std::string &instrumentName,
-                           const std::string &filename,
-                           const std::string &jobID, const std::string &broker,
+                           int32_t runNumber, const std::string &broker,
                            const std::string &runCycle);
 
   // Get the output command messages as strings
@@ -41,14 +39,15 @@ private:
                             const std::string &instrumentName);
   void addInstrument(const std::string &instrumentNameStr);
   void addRunCycle(const std::string &runCycleStr);
+  void addRunNumber(int32_t runNumber);
 
   template <typename T>
   nlohmann::json createDataset(const std::string &name,
                                const std::string &typeStr, T value) const;
   template <typename T>
-  nlohmann::json createDataset(
-      const std::string &name, const std::string &typeStr, T value,
-      const std::vector<Attribute> &attributes) const;
+  nlohmann::json createDataset(const std::string &name,
+                               const std::string &typeStr, T value,
+                               const std::vector<Attribute> &attributes) const;
 
   nlohmann::json
   createInstrumentNameJson(const std::string &instrumentNameStr) const;

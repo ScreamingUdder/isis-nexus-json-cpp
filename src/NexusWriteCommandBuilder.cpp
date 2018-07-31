@@ -3,12 +3,13 @@
 using json = nlohmann::json;
 
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
-    const std::string &instrumentName, const std::string &filename,
-    const std::string &jobID, const std::string &broker,
-    const std::string &runCycle)
-    : m_jobID(jobID) {
+    const std::string &instrumentName, const int32_t runNumber,
+    const std::string &broker, const std::string &runCycle)
+    : m_jobID(instrumentName + "_" + std::to_string(runNumber)) {
+  const std::string filename = instrumentName + "_" + std::to_string(runNumber) + ".nxs";
   initStartMessageJson(broker, filename, instrumentName);
   addRunCycle(runCycle);
+  addRunNumber(runNumber);
   addInstrument(instrumentName);
 }
 
@@ -27,20 +28,30 @@ void NexusWriteCommandBuilder::addTitle(const std::string &title) {
       dataset);
 }
 
-void NexusWriteCommandBuilder::addTotalCounts(uint64_t totalCounts) {
+void NexusWriteCommandBuilder::addTotalCounts(const uint64_t totalCounts) {
   auto dataset = createDataset<uint64_t>("total_counts", "uint64", totalCounts);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
 
-void NexusWriteCommandBuilder::addMonitorEventsNotSaved(int64_t monitorEventsNotSaved) {
-  auto dataset = createDataset<int64_t>("monitor_events_not_saved", "int64", monitorEventsNotSaved);
+void NexusWriteCommandBuilder::addMonitorEventsNotSaved(
+    const int64_t monitorEventsNotSaved) {
+  auto dataset = createDataset<int64_t>("monitor_events_not_saved", "int64",
+                                        monitorEventsNotSaved);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
 
-void NexusWriteCommandBuilder::addTotalUncountedCounts(int32_t uncountedCounts) {
-  auto dataset = createDataset<int32_t>("total_uncounted_counts", "int32", uncountedCounts);
+void NexusWriteCommandBuilder::addTotalUncountedCounts(
+    const int32_t uncountedCounts) {
+  auto dataset = createDataset<int32_t>("total_uncounted_counts", "int32",
+                                        uncountedCounts);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addRunNumber(const int32_t runNumber) {
+  auto dataset = createDataset<int32_t>("run_number", "int32", runNumber);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
@@ -109,14 +120,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "measurement_label",
               "values": " "
-            },
-            {
-              "dataset": {
-                "type": "int32"
-              },
-              "type": "dataset",
-              "name": "run_number",
-              "values": 4112
             },
             {
               "dataset": {
