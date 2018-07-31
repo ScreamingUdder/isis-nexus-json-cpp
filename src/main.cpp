@@ -20,6 +20,7 @@ int main() {
   commandBuilder.addTotalUncountedCounts(7629);
   commandBuilder.addMeasurement();
   commandBuilder.addCollectionTime(1837.0);
+  commandBuilder.addDuration(1837.0);
   commandBuilder.addProgramName(
       "ISISICP.EXE",
       "SVN R1959 (2018/06/13 13:15:08, Mixed revision WC 1958:1959, Modified)");

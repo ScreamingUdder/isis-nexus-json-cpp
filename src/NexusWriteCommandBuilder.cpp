@@ -129,6 +129,13 @@ void NexusWriteCommandBuilder::addCollectionTime(
       dataset);
 }
 
+void NexusWriteCommandBuilder::addDuration(float durationInSeconds) {
+  auto dataset = createDataset<float>("duration", "float", durationInSeconds,
+                                      {{"units", "second"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addUser(const std::string &name,
                                        const std::string &affiliation) {
   m_numberOfUsers++;
@@ -268,20 +275,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "script_name",
               "values": " "
-            },
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "second"
-                }
-              ],
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "duration",
-              "values": 1837.0
             },
             {
               "dataset": {
