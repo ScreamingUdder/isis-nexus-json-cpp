@@ -37,6 +37,8 @@ public:
   void addMeasurementLabel(const std::string &measurementLabel);
   void addMeasurementID(const std::string &measurementID);
   void addSeciConfig(const std::string &SeciConfig);
+
+  // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
 
 private:

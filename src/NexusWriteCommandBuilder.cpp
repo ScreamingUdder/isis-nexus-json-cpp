@@ -707,114 +707,29 @@ json NexusWriteCommandBuilder::createGroup(
 
 void NexusWriteCommandBuilder::addInstrument(
     const std::string &instrumentNameStr) {
-  // clang-format off
-  auto instrument = R"(
-    {
-      "attributes": [
-        {
-          "name": "NX_class",
-          "values": "NXinstrument"
-        }
-      ],
-      "children": [
-        {
-          "attributes": [
-            {
-              "name": "NX_class",
-              "values": "NXmoderator"
-            }
-          ],
-          "children": [
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "metre"
-                }
-              ],
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "distance",
-              "values": -0.0
-            }
-          ],
-          "type": "group",
-          "name": "moderator"
-        },
-        {
-          "attributes": [
-            {
-              "name": "NX_class",
-              "values": "NXdetector"
-            }
-          ],
-          "children": [
-            {
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "source_detector_distance",
-              "values": 0.0
-            },
-            {
-              "children": [],
-              "type": "group",
-              "name": "period_index"
-            }
-          ],
-          "type": "group",
-          "name": "detector_1"
-        },
-        {
-          "attributes": [
-            {
-              "name": "NX_class",
-              "values": "NXsource"
-            }
-          ],
-          "children": [
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "probe",
-              "values": "neutrons"
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "type",
-              "values": "Pulsed Neutron Source"
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "name",
-              "values": "ISIS"
-            }
-          ],
-          "type": "group",
-          "name": "source"
-        }
-      ],
-      "type": "group",
-      "name": "instrument"
-    }
-  )"_json;
-  // clang-format on
 
-  instrument["children"].push_back(createInstrumentNameJson(instrumentNameStr));
+  auto moderatorGroup = createGroup("moderator", {{"NX_class", "NXmoderator"}});
+  moderatorGroup["children"].push_back(
+      createDataset<float>("distance", "float", 0.0, {{"units", "metre"}}));
+
+  auto sourceGroup = createGroup("source", {{"NX_class", "NXsource"}});
+  sourceGroup["children"].push_back(
+      createDataset<std::string>("probe", "string", "neutrons"));
+  sourceGroup["children"].push_back(
+      createDataset<std::string>("type", "string", "Pulsed Neutron Source"));
+  sourceGroup["children"].push_back(
+      createDataset<std::string>("name", "string", "ISIS"));
+
+  auto instrumentGroup =
+      createGroup("instrument", {{"NX_class", "NXinstrument"}});
+  instrumentGroup["children"].push_back(moderatorGroup);
+  instrumentGroup["children"].push_back(sourceGroup);
+
+  instrumentGroup["children"].push_back(
+      createInstrumentNameJson(instrumentNameStr));
 
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      instrument);
+      instrumentGroup);
 }
 
 json NexusWriteCommandBuilder::createInstrumentNameJson(
