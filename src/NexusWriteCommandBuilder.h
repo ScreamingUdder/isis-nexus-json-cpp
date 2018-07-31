@@ -43,6 +43,7 @@ public:
                       const std::string &subId = "",
                       const std::string &type = "", int32_t firstRun = 0);
   void addEventData(uint32_t detectorNumber, const std::string &sourceName);
+  void addSELogData(const std::vector<std::pair<std::string, std::string>> &pVs);
   void addProgramName(const std::string &programName,
                       const std::string &version);
   void addNexusDefinition(const std::string &name, const std::string &version,
@@ -76,7 +77,12 @@ private:
   nlohmann::json createNode(const std::string &name, NodeType nodeType,
                             const std::vector<Attribute> &attributes) const;
 
-  nlohmann::json createInstrumentNameJson(const std::string &instrumentNameStr);
+  nlohmann::json
+  createStream(const std::string &module, const std::string &nexusPath,
+               const std::string &source, const std::string &topic) const;
+
+      nlohmann::json
+      createInstrumentNameJson(const std::string &instrumentNameStr);
   nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;

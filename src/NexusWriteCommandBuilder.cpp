@@ -197,23 +197,41 @@ void NexusWriteCommandBuilder::addMeasurement(const std::string &label,
       createDataset<int32_t>("measurement_first_run", "int32", firstRun));
 }
 
+json NexusWriteCommandBuilder::createStream(const std::string &module,
+                                            const std::string &nexusPath,
+                                            const std::string &source,
+                                            const std::string &topic) const {
+  json stream = {{"type", "stream"}};
+  stream["stream"] = {{"writer_module", module},
+                      {"nexus_path", nexusPath},
+                      {"source", source},
+                      {"topic", topic}};
+
+  return stream;
+}
+
 void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
                                             const std::string &sourceName) {
+  auto eventDataStream =
+      createStream("ev42", "/raw_data_1/detector_" +
+                               std::to_string(detectorNumber) + "_events",
+                   sourceName, m_instrumentName + "_events");
 
-  auto eventDataGroup =
-      createGroup("detector_" + std::to_string(detectorNumber) + "_events",
-                  {{"NX_class", "NXevent_data"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      eventDataStream);
+}
 
-  auto eventDataStream = json::object();
-  eventDataStream["type"] = "stream";
-  eventDataStream["stream"] = {
-      {"writer_module", "ev42"},
-      {"nexus_path",
-       "/raw_data_1/detector_" + std::to_string(detectorNumber) + "_events"},
-      {"source", sourceName},
-      {"topic", m_instrumentName + "_events"}};
+void NexusWriteCommandBuilder::addSELogData(
+    const std::vector<std::pair<std::string, std::string>> &pVs) {
+  const std::string topicName = m_instrumentName + "_sampleEnv";
+  auto selogGroup = createGroup("selog", {{"NX_class", "IXselog"}});
 
-  eventDataGroup["children"].push_back(eventDataStream);
+  for (const auto &pv : pVs) {
+    selogGroup["children"].push_back(createStream(
+        "f142", "/raw_data_1/selog/" + pv.second, pv.first, topicName));
+  }
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      selogGroup);
 }
 
 void NexusWriteCommandBuilder::initStartMessageJson(
@@ -231,27 +249,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             }
           ],
           "children": [
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "IXselog"
-                }
-              ],
-              "children": [
-                {
-                  "stream": {
-                    "writer_module": "f142",
-                    "nexus_path": "/raw_data_1/selog",
-                    "source": "FakePV",
-                    "topic": "TEST_sampleEnv"
-                  },
-                  "type": "stream"
-                }
-              ],
-              "type": "group",
-              "name": "selog"
-            },
             {
               "dataset": {
                 "type": "string"
