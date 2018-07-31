@@ -40,6 +40,7 @@ public:
   void addMeasurement(const std::string &label = "", const std::string &id = "",
                       const std::string &subId = "",
                       const std::string &type = "", int32_t firstRun = 0);
+  void addEventData(uint32_t detectorNumber, const std::string &sourceName);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
@@ -67,6 +68,7 @@ private:
   nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;
+  const std::string m_instrumentName;
   nlohmann::json m_startMessageJson;
   uint32_t m_numberOfUsers = 0;
 };

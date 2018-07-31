@@ -5,7 +5,8 @@ using json = nlohmann::json;
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const int32_t runNumber,
     const std::string &broker, const std::string &runCycle)
-    : m_jobID(instrumentName + "_" + std::to_string(runNumber)) {
+    : m_jobID(instrumentName + "_" + std::to_string(runNumber)),
+      m_instrumentName(instrumentName) {
   const std::string filename =
       instrumentName + "_" + std::to_string(runNumber) + ".nxs";
   initStartMessageJson(broker, filename, instrumentName);
@@ -132,6 +133,25 @@ void NexusWriteCommandBuilder::addMeasurement(const std::string &label,
       createDataset<int32_t>("measurement_first_run", "int32", firstRun));
 }
 
+void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
+                                            const std::string &sourceName) {
+
+  auto eventDataGroup =
+      createGroup("detector_" + std::to_string(detectorNumber) + "_events",
+                  {{"NX_class", "NXevent_data"}});
+
+  auto eventDataStream = json::object();
+  eventDataStream["type"] = "stream";
+  eventDataStream["stream"] = {
+      {"writer_module", "ev42"},
+      {"nexus_path",
+       "/raw_data_1/detector_" + std::to_string(detectorNumber) + "_events"},
+      {"source", sourceName},
+      {"topic", m_instrumentName + "_events"}};
+
+  eventDataGroup["children"].push_back(eventDataStream);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -167,27 +187,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "selog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXevent_data"
-                }
-              ],
-              "children": [
-                {
-                  "stream": {
-                    "writer_module": "ev42",
-                    "nexus_path": "/raw_data_1/detector_1_events",
-                    "source": "MUST MATCH SOURCE NAME SET IN ICP",
-                    "topic": "INSTR_events"
-                  },
-                  "type": "stream"
-                }
-              ],
-              "type": "group",
-              "name": "detector_1_events"
             },
             {
               "attributes": [

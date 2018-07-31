@@ -26,8 +26,10 @@ int main() {
   commandBuilder.addUser("Bob", "The Unseen University");
 
   commandBuilder.addDetector(1, 0.0);
+  // NB, source name for addEventData must match whatever the ICP sets as the
+  // source name in event data messages it produces
+  commandBuilder.addEventData(1, "ICP");
 
-  // TODO Add event data
   // TODO Add periodLog
   // TODO Add seLog (take vector of PV names)
 
