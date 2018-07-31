@@ -78,6 +78,19 @@ void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
       dataset);
 }
 
+void NexusWriteCommandBuilder::addUser(const std::string &name,
+                                       const std::string &affiliation) {
+  m_numberOfUsers++;
+  auto userGroup = createGroup("user_" + std::to_string(m_numberOfUsers),
+                               {{"NX_class", "NXuser"}});
+  userGroup["children"].push_back(createDataset("name", "string", name));
+  userGroup["children"].push_back(
+      createDataset("affiliation", "string", affiliation));
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      userGroup);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -151,34 +164,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "detector_1"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXuser"
-                }
-              ],
-              "children": [
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "affiliation",
-                  "values": " "
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "name",
-                  "values": " "
-                }
-              ],
-              "type": "group",
-              "name": "user_1"
             },
             {
               "attributes": [
@@ -639,7 +624,7 @@ void NexusWriteCommandBuilder::initStartMessageJson(
 }
 
 json NexusWriteCommandBuilder::createBeamlineJson(
-    const std::string &beamlineName) const {
+    const std::string &beamlineName) {
   return createDataset<std::string>("beamline", "string", beamlineName);
 }
 
@@ -691,44 +676,50 @@ void NexusWriteCommandBuilder::addSample(float height, float thickness,
       sample);
 }
 
-template <typename T>
-json NexusWriteCommandBuilder::createDataset(const std::string &name,
-                                             const std::string &typeStr,
-                                             T value) const {
-  // clang-format off
-  auto dataset = R"(
-    {
-      "dataset": {
-        "type": "PLACEHOLDER"
-      },
-      "type": "dataset",
-      "name": "PLACEHOLDER",
-      "values": "PLACEHOLDER"
+json NexusWriteCommandBuilder::createNode(
+    const std::string &name, const NodeType nodeType,
+    const std::vector<Attribute> &attributes) const {
+  auto node = json::object();
+
+  node["name"] = name;
+
+  if (nodeType == NodeType::DATASET) {
+    node["type"] = "dataset";
+  } else if (nodeType == NodeType::GROUP) {
+    node["type"] = "group";
+    node["children"] = json::array();
+  } else {
+    throw std::runtime_error(
+        "Unhandled NodeType in NexusWriteCommandBuilder::createNode()");
+  }
+
+  if (!attributes.empty()) {
+    node["attributes"] = {};
+    for (const auto &attribute : attributes) {
+      node["attributes"].push_back(
+          {{"name", attribute.name}, {"values", attribute.value}});
     }
-  )"_json;
-  // clang-format on
+  }
 
-  std::stringstream strStream;
-  strStream << value;
-  dataset["values"] = strStream.str();
-
-  dataset["name"] = name;
-  dataset["dataset"]["type"] = typeStr;
-
-  return dataset;
+  return node;
 }
 
 template <typename T>
 json NexusWriteCommandBuilder::createDataset(
     const std::string &name, const std::string &typeStr, T value,
-    const std::vector<Attribute> &attributes) const {
-  auto dataset = createDataset<T>(name, typeStr, value);
-  dataset["attributes"] = {};
-  for (const auto &attribute : attributes) {
-    dataset["attributes"].push_back(
-        {{"name", attribute.name}, {"values", attribute.value}});
-  }
+    const std::vector<Attribute> &attributes) {
+  auto dataset = createNode(name, NodeType::DATASET, attributes);
+  std::stringstream strStream;
+  strStream << value;
+  dataset["values"] = strStream.str();
+  dataset["dataset"] = {"type", typeStr};
+
   return dataset;
+}
+
+json NexusWriteCommandBuilder::createGroup(
+    const std::string &name, const std::vector<Attribute> &attributes) {
+  return createNode(name, NodeType::GROUP, attributes);
 }
 
 void NexusWriteCommandBuilder::addInstrument(

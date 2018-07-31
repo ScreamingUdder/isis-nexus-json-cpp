@@ -8,6 +8,8 @@ struct Attribute {
   const std::string name;
   const std::string value;
 };
+
+enum class NodeType { DATASET, GROUP };
 }
 
 class NexusWriteCommandBuilder {
@@ -35,6 +37,7 @@ public:
   void addMeasurementLabel(const std::string &measurementLabel);
   void addMeasurementID(const std::string &measurementID);
   void addSeciConfig(const std::string &SeciConfig);
+  void addUser(const std::string &name, const std::string &affiliation);
 
 private:
   void initStartMessageJson(const std::string &broker,
@@ -46,16 +49,20 @@ private:
 
   template <typename T>
   nlohmann::json createDataset(const std::string &name,
-                               const std::string &typeStr, T value) const;
-  template <typename T>
-  nlohmann::json createDataset(const std::string &name,
                                const std::string &typeStr, T value,
-                               const std::vector<Attribute> &attributes) const;
+                               const std::vector<Attribute> &attributes = {});
+
+  nlohmann::json createGroup(const std::string &name,
+                             const std::vector<Attribute> &attributes);
+
+  nlohmann::json createNode(const std::string &name, NodeType nodeType,
+                            const std::vector<Attribute> &attributes) const;
 
   nlohmann::json
   createInstrumentNameJson(const std::string &instrumentNameStr) const;
-  nlohmann::json createBeamlineJson(const std::string &beamlineName) const;
+  nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;
   nlohmann::json m_startMessageJson;
+  uint32_t m_numberOfUsers = 0;
 };

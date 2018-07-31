@@ -21,6 +21,10 @@ int main() {
   commandBuilder.addMeasurementID(" ");
   commandBuilder.addSeciConfig(" ");
 
+  // Add some users
+  commandBuilder.addUser("Alice", "The Unseen University");
+  commandBuilder.addUser("Bob", "The Unseen University");
+
   // TODO Add detector
 
   // TODO Add event data
