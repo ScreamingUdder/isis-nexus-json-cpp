@@ -72,6 +72,15 @@ void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
       dataset);
 }
 
+void NexusWriteCommandBuilder::addCollectionTime(
+    float collectionTimeInSeconds) {
+  auto dataset =
+      createDataset<float>("collection_time", "float", collectionTimeInSeconds,
+                           {{"units", "second"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addUser(const std::string &name,
                                        const std::string &affiliation) {
   m_numberOfUsers++;
@@ -187,37 +196,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "selog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXdata"
-                }
-              ],
-              "children": [
-                {
-                  "children": [],
-                  "type": "group",
-                  "name": "period_index"
-                }
-              ],
-              "type": "group",
-              "name": "detector_1"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "second"
-                }
-              ],
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "collection_time",
-              "values": 1837.0
             },
             {
               "attributes": [

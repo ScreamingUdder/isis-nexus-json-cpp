@@ -20,6 +20,7 @@ int main() {
   commandBuilder.addTotalUncountedCounts(7629);
   commandBuilder.addMeasurement();
   commandBuilder.addSeciConfig(" ");
+  commandBuilder.addCollectionTime(1837.0);
 
   // Add some users
   commandBuilder.addUser("Alice", "The Unseen University");

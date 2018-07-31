@@ -31,6 +31,7 @@ public:
                  const std::string &id = "");
   void addStartTime(const std::string &startTimeIso8601);
   void addEndTime(const std::string &endTimeIso8601);
+  void addCollectionTime(float collectionTimeInSeconds);
   void addTitle(const std::string &title);
   void addTotalCounts(uint64_t totalCounts);
   void addMonitorEventsNotSaved(int64_t monitorEventsNotSaved);
