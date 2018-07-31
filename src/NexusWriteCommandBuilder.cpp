@@ -112,6 +112,14 @@ void NexusWriteCommandBuilder::addProtonChargeRawInMicroAmpHours(
       dataset);
 }
 
+void NexusWriteCommandBuilder::addProtonChargeInMicroAmpHours(
+    float protonCharge) {
+  auto dataset = createDataset<float>("proton_charge", "float", protonCharge,
+                                      {{"units", "uAh"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addCollectionTime(
     float collectionTimeInSeconds) {
   auto dataset =
@@ -274,20 +282,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "duration",
               "values": 1837.0
-            },
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "uAh"
-                }
-              ],
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "proton_charge",
-              "values": 20.061872482299805
             },
             {
               "dataset": {

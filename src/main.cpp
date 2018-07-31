@@ -30,6 +30,7 @@ int main() {
       "ISISTOFRAW", "1.0",
       "http://svn.isis.rl.ac.uk/instruments/ISISTOFRAW?version=1.0");
   commandBuilder.addProtonChargeRawInMicroAmpHours(20.061872482299805);
+  commandBuilder.addProtonChargeInMicroAmpHours(20.061872482299805);
   commandBuilder.addSeciConfig(" ");
   commandBuilder.addNotes(" ");
 
