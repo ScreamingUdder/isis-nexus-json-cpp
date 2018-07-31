@@ -14,11 +14,17 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
 
 void NexusWriteCommandBuilder::addStartTime(
     const std::string &startTimeIso8601) {
-  auto startTime =
+  auto dataset =
       createDataset<std::string>("start_time", "string", startTimeIso8601,
                                  {Attribute{"units", "ISO8601"}});
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      startTime);
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addTitle(const std::string &title) {
+  auto dataset = createDataset<std::string>("title", "string", title);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
 }
 
 void NexusWriteCommandBuilder::initStartMessageJson(
@@ -36,14 +42,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             }
           ],
           "children": [
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "title",
-              "values": "MT Beam A2=6mm SANS"
-            },
             {
               "attributes": [
                 {

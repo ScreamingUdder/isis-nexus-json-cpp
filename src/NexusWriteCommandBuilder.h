@@ -30,6 +30,7 @@ public:
                  const std::string &name = "", const std::string &type = "",
                  const std::string &id = "");
   void addStartTime(const std::string &startTimeIso8601);
+  void addTitle(const std::string &title);
 
 private:
   void initStartMessageJson(const std::string &broker,
