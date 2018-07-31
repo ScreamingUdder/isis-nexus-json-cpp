@@ -59,7 +59,7 @@ private:
                             const std::vector<Attribute> &attributes) const;
 
   nlohmann::json
-  createInstrumentNameJson(const std::string &instrumentNameStr) const;
+  createInstrumentNameJson(const std::string &instrumentNameStr);
   nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;

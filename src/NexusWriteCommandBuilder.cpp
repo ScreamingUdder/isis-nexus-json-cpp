@@ -835,30 +835,10 @@ void NexusWriteCommandBuilder::addInstrument(
 }
 
 json NexusWriteCommandBuilder::createInstrumentNameJson(
-    const std::string &instrumentNameStr) const {
-  // clang-format off
-  auto instrumentName = R"(
-  {
-    "attributes": [
-      {
-        "name": "short_name",
-        "values": "PLACEHOLDER"
-      }
-    ],
-    "dataset": {
-      "type": "string"
-    },
-    "type": "dataset",
-    "name": "name",
-    "values": "PLACEHOLDER"
-  }
-  )"_json;
-  // clang-format on
-
-  instrumentName["values"] = instrumentNameStr;
-  instrumentName["attributes"][0]["values"] = instrumentNameStr.substr(0, 3);
-
-  return instrumentName;
+    const std::string &instrumentNameStr) {
+  return createDataset<std::string>(
+      "name", "string", instrumentNameStr,
+      {{"short_name", instrumentNameStr.substr(0, 3)}});
 }
 
 void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
