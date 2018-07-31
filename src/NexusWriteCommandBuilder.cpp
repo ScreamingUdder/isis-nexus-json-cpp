@@ -91,6 +91,22 @@ void NexusWriteCommandBuilder::addUser(const std::string &name,
       userGroup);
 }
 
+void NexusWriteCommandBuilder::addDetector(uint32_t detectorNumber,
+                                           float sourceDetectorDistance) {
+  auto detectorGroup = createGroup("detector_" + std::to_string(detectorNumber),
+                                   {{"NX_class", "NXdetector"}});
+  detectorGroup["children"].push_back(createDataset<float>(
+      "source_detector_distance", "float", sourceDetectorDistance));
+  detectorGroup["children"].push_back(createGroup("period_index"));
+
+  for (auto &node :
+       m_startMessageJson["nexus_structure"]["children"][0]["children"]) {
+    if (node["name"] == "instrument") {
+      node["children"].push_back(detectorGroup);
+    }
+  }
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {

@@ -25,11 +25,11 @@ int main() {
   commandBuilder.addUser("Alice", "The Unseen University");
   commandBuilder.addUser("Bob", "The Unseen University");
 
-  // TODO Add detector
+  commandBuilder.addDetector(1, 0.0);
 
   // TODO Add event data
 
-  // TODO Add PVs (take vector of PV names)
+  // TODO Add logs (take vector of PV names)
 
   // Add 8 monitors
   for (uint32_t monitorNumber = 1; monitorNumber <= 8; monitorNumber++) {
@@ -41,9 +41,13 @@ int main() {
   std::cout << commandBuilder.startMessageAsString() << std::endl;
   std::cout << commandBuilder.stopMessageAsString() << std::endl;
 
-  std::ofstream out("startMessage.json");
-  out << commandBuilder.startMessageAsString();
-  out.close();
+  std::ofstream startOut("startMessage.json");
+  startOut << commandBuilder.startMessageAsString();
+  startOut.close();
+
+  std::ofstream stopOut("stopMessage.json");
+  stopOut << commandBuilder.startMessageAsString();
+  stopOut.close();
 
   return 0;
 }

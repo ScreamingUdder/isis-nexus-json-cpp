@@ -37,6 +37,7 @@ public:
   void addMeasurementLabel(const std::string &measurementLabel);
   void addMeasurementID(const std::string &measurementID);
   void addSeciConfig(const std::string &SeciConfig);
+  void addDetector(uint32_t detectorNumber, float sourceDetectorDistance);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
@@ -60,8 +61,7 @@ private:
   nlohmann::json createNode(const std::string &name, NodeType nodeType,
                             const std::vector<Attribute> &attributes) const;
 
-  nlohmann::json
-  createInstrumentNameJson(const std::string &instrumentNameStr);
+  nlohmann::json createInstrumentNameJson(const std::string &instrumentNameStr);
   nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;
