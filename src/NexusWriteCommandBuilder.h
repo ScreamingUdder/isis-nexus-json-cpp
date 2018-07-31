@@ -49,6 +49,8 @@ public:
   void addLocalNexusDefinition(const std::string &name,
                                const std::string &version,
                                const std::string &url);
+  void addNotes(const std::string &notes);
+  void addProtonChargeRawInMicroAmpHours(float protonCharge);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);

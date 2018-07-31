@@ -19,7 +19,6 @@ int main() {
   commandBuilder.addMonitorEventsNotSaved(0);
   commandBuilder.addTotalUncountedCounts(7629);
   commandBuilder.addMeasurement();
-  commandBuilder.addSeciConfig(" ");
   commandBuilder.addCollectionTime(1837.0);
   commandBuilder.addProgramName(
       "ISISICP.EXE",
@@ -30,6 +29,9 @@ int main() {
   commandBuilder.addLocalNexusDefinition(
       "ISISTOFRAW", "1.0",
       "http://svn.isis.rl.ac.uk/instruments/ISISTOFRAW?version=1.0");
+  commandBuilder.addProtonChargeRawInMicroAmpHours(20.061872482299805);
+  commandBuilder.addSeciConfig(" ");
+  commandBuilder.addNotes(" ");
 
   // Add some users
   commandBuilder.addUser("Alice", "The Unseen University");

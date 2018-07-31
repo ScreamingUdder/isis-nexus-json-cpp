@@ -98,6 +98,20 @@ void NexusWriteCommandBuilder::addLocalNexusDefinition(
       dataset);
 }
 
+void NexusWriteCommandBuilder::addNotes(const std::string &notes) {
+  auto dataset = createDataset<std::string>("notes", "string", notes);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addProtonChargeRawInMicroAmpHours(
+    float protonCharge) {
+  auto dataset = createDataset<float>("proton_charge_raw", "float",
+                                      protonCharge, {{"units", "uAh"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addCollectionTime(
     float collectionTimeInSeconds) {
   auto dataset =
@@ -348,14 +362,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "name": "framelog"
             },
             {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "notes",
-              "values": " "
-            },
-            {
               "attributes": [
                 {
                   "name": "NX_class",
@@ -488,20 +494,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "periods"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "uAh"
-                }
-              ],
-              "dataset": {
-                "type": "float"
-              },
-              "type": "dataset",
-              "name": "proton_charge_raw",
-              "values": 20.061872482299805
             }
           ],
           "type": "group",
