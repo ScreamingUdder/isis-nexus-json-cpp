@@ -33,6 +33,7 @@ public:
   void addTitle(const std::string &title);
   void addTotalCounts(uint64_t totalCounts);
   void addMonitorEventsNotSaved(int64_t monitorEventsNotSaved);
+  void addTotalUncountedCounts(int32_t uncountedCounts);
 
 private:
   void initStartMessageJson(const std::string &broker,

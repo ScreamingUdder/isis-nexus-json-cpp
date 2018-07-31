@@ -23,6 +23,7 @@ int main() {
   commandBuilder.addTitle("MT Beam A2=6mm SANS");
   commandBuilder.addTotalCounts(170700);
   commandBuilder.addMonitorEventsNotSaved(0);
+  commandBuilder.addTotalUncountedCounts(7629);
 
   // TODO Add detector
 

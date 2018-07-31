@@ -39,6 +39,12 @@ void NexusWriteCommandBuilder::addMonitorEventsNotSaved(int64_t monitorEventsNot
       dataset);
 }
 
+void NexusWriteCommandBuilder::addTotalUncountedCounts(int32_t uncountedCounts) {
+  auto dataset = createDataset<int32_t>("total_uncounted_counts", "int32", uncountedCounts);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -95,22 +101,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "detector_1_events"
-            },
-            {
-              "dataset": {
-                "type": "int64"
-              },
-              "type": "dataset",
-              "name": "monitor_events_not_saved",
-              "values": 0
-            },
-            {
-              "dataset": {
-                "type": "int32"
-              },
-              "type": "dataset",
-              "name": "total_uncounted_counts",
-              "values": 7629
             },
             {
               "dataset": {
