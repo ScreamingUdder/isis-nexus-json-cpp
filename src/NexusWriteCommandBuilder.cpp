@@ -6,7 +6,8 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const int32_t runNumber,
     const std::string &broker, const std::string &runCycle)
     : m_jobID(instrumentName + "_" + std::to_string(runNumber)) {
-  const std::string filename = instrumentName + "_" + std::to_string(runNumber) + ".nxs";
+  const std::string filename =
+      instrumentName + "_" + std::to_string(runNumber) + ".nxs";
   initStartMessageJson(broker, filename, instrumentName);
   addRunCycle(runCycle);
   addRunNumber(runNumber);
@@ -52,6 +53,27 @@ void NexusWriteCommandBuilder::addTotalUncountedCounts(
 
 void NexusWriteCommandBuilder::addRunNumber(const int32_t runNumber) {
   auto dataset = createDataset<int32_t>("run_number", "int32", runNumber);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addMeasurementLabel(
+    const std::string &measurementLabel) {
+  auto dataset =
+      createDataset<std::string>("title", "string", measurementLabel);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addMeasurementID(
+    const std::string &measurementID) {
+  auto dataset = createDataset<std::string>("title", "string", measurementID);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
+void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
+  auto dataset = createDataset<std::string>("title", "string", SeciConfig);
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       dataset);
 }
@@ -112,30 +134,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "detector_1_events"
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "measurement_label",
-              "values": " "
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "seci_config",
-              "values": " "
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "measurement_id",
-              "values": " "
             },
             {
               "attributes": [

@@ -17,6 +17,9 @@ int main() {
   commandBuilder.addTotalCounts(170700);
   commandBuilder.addMonitorEventsNotSaved(0);
   commandBuilder.addTotalUncountedCounts(7629);
+  commandBuilder.addMeasurementLabel(" ");
+  commandBuilder.addMeasurementID(" ");
+  commandBuilder.addSeciConfig(" ");
 
   // TODO Add detector
 

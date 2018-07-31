@@ -12,8 +12,8 @@ struct Attribute {
 
 class NexusWriteCommandBuilder {
 public:
-  NexusWriteCommandBuilder(const std::string &instrumentName,
-                           int32_t runNumber, const std::string &broker,
+  NexusWriteCommandBuilder(const std::string &instrumentName, int32_t runNumber,
+                           const std::string &broker,
                            const std::string &runCycle);
 
   // Get the output command messages as strings
@@ -32,6 +32,9 @@ public:
   void addTotalCounts(uint64_t totalCounts);
   void addMonitorEventsNotSaved(int64_t monitorEventsNotSaved);
   void addTotalUncountedCounts(int32_t uncountedCounts);
+  void addMeasurementLabel(const std::string &measurementLabel);
+  void addMeasurementID(const std::string &measurementID);
+  void addSeciConfig(const std::string &SeciConfig);
 
 private:
   void initStartMessageJson(const std::string &broker,
