@@ -21,6 +21,9 @@ int main() {
   commandBuilder.addMeasurement();
   commandBuilder.addSeciConfig(" ");
   commandBuilder.addCollectionTime(1837.0);
+  commandBuilder.addProgramName(
+      "ISISICP.EXE",
+      "SVN R1959 (2018/06/13 13:15:08, Mixed revision WC 1958:1959, Modified)");
 
   // Add some users
   commandBuilder.addUser("Alice", "The Unseen University");

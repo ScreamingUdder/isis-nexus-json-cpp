@@ -42,6 +42,8 @@ public:
                       const std::string &subId = "",
                       const std::string &type = "", int32_t firstRun = 0);
   void addEventData(uint32_t detectorNumber, const std::string &sourceName);
+  void addProgramName(const std::string &programName,
+                      const std::string &version);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);

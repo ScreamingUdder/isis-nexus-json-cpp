@@ -72,6 +72,14 @@ void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
       dataset);
 }
 
+void NexusWriteCommandBuilder::addProgramName(const std::string &programName,
+                                              const std::string &version) {
+  auto dataset = createDataset<std::string>(
+      "program_name", "string", programName, {{"version", version}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addCollectionTime(
     float collectionTimeInSeconds) {
   auto dataset =
@@ -196,20 +204,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "selog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "version",
-                  "values": "SVN R1959 (2018/06/13 13:15:08, Mixed revision WC 1958:1959, Modified) "
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "program_name",
-              "values": "ISISICP.EXE"
             },
             {
               "attributes": [
