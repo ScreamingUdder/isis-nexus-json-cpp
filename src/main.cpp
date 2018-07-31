@@ -27,6 +27,9 @@ int main() {
   commandBuilder.addNexusDefinition(
       "TOFRAW", "1.0",
       "http://definition.nexusformat.org/instruments/TOFRAW?version=1.0");
+  commandBuilder.addLocalNexusDefinition(
+      "ISISTOFRAW", "1.0",
+      "http://svn.isis.rl.ac.uk/instruments/ISISTOFRAW?version=1.0");
 
   // Add some users
   commandBuilder.addUser("Alice", "The Unseen University");

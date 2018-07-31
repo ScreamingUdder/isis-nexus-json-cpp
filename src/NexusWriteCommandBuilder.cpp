@@ -89,6 +89,15 @@ void NexusWriteCommandBuilder::addNexusDefinition(const std::string &name,
       dataset);
 }
 
+void NexusWriteCommandBuilder::addLocalNexusDefinition(
+    const std::string &name, const std::string &version,
+    const std::string &url) {
+  auto dataset = createDataset<std::string>(
+      "definition_local", "string", name, {{"version", version}, {"url", url}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      dataset);
+}
+
 void NexusWriteCommandBuilder::addCollectionTime(
     float collectionTimeInSeconds) {
   auto dataset =
@@ -265,24 +274,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               "type": "dataset",
               "name": "proton_charge",
               "values": 20.061872482299805
-            },
-            {
-              "attributes": [
-                {
-                  "name": "version",
-                  "values": "1.0"
-                },
-                {
-                  "name": "url",
-                  "values": "http://svn.isis.rl.ac.uk/instruments/ISISTOFRAW?version=1.0"
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "definition_local",
-              "values": "ISISTOFRAW"
             },
             {
               "dataset": {
