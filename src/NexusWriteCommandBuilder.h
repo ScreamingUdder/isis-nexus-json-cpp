@@ -5,8 +5,8 @@
 namespace {
 
 struct Attribute {
-  std::string name;
-  std::string value;
+  const std::string name;
+  const std::string value;
 };
 
 }
@@ -17,14 +17,19 @@ public:
                            const std::string &filename,
                            const std::string &jobID, const std::string &broker,
                            const std::string &runCycle);
+
+  // Get the output command messages as strings
   std::string startMessageAsString();
   std::string stopMessageAsString();
+
+  // Add stuff to the file
   void addSampleEnvLog(const std::string &name);
   void addMonitor(uint32_t monitorNumber, uint32_t spectrumNumber);
   void addSample(float height, float thickness, float width,
                  double distance = 0.0, const std::string &shape = "",
                  const std::string &name = "", const std::string &type = "",
                  const std::string &id = "");
+  void addStartTime(const std::string &startTimeIso8601);
 
 private:
   void initStartMessageJson(const std::string &broker,

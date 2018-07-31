@@ -12,6 +12,15 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
   addInstrument(instrumentName);
 }
 
+void NexusWriteCommandBuilder::addStartTime(
+    const std::string &startTimeIso8601) {
+  auto startTime =
+      createDataset<std::string>("start_time", "string", startTimeIso8601,
+                                 {Attribute{"units", "ISO8601"}});
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      startTime);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -27,20 +36,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             }
           ],
           "children": [
-            {
-              "attributes": [
-                {
-                  "name": "units",
-                  "values": "ISO8601"
-                }
-              ],
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "start_time",
-              "values": "2018-07-06T09:47:44"
-            },
             {
               "dataset": {
                 "type": "string"
@@ -740,6 +735,7 @@ json NexusWriteCommandBuilder::createDataset(
     dataset["attributes"].push_back(
         {{"name", attribute.name}, {"values", attribute.value}});
   }
+  return dataset;
 }
 
 void NexusWriteCommandBuilder::addInstrument(
