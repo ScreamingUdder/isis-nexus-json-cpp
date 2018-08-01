@@ -67,12 +67,11 @@ public:
   void addUser(const std::string &name, const std::string &affiliation);
 
 private:
-  void initStartMessageJson(const std::string &broker,
-                            const std::string &filename,
-                            const std::string &instrumentName);
+  void initEntryGroupJson();
   void addInstrument(const std::string &instrumentNameStr);
   void addRunCycle(const std::string &runCycleStr);
   void addRunNumber(int32_t runNumber);
+  void initIsisVmsCompat();
 
   template <typename T>
   nlohmann::json createDataset(const std::string &name,
@@ -95,6 +94,9 @@ private:
 
   const std::string m_jobID;
   const std::string m_instrumentName;
-  nlohmann::json m_startMessageJson;
+  const std::string m_broker;
+  const std::string m_filename;
+  nlohmann::json m_entryGroupJson;
+  nlohmann::json m_isisVmsCompatJson;
   uint32_t m_numberOfUsers = 0;
 };

@@ -19,10 +19,10 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const int32_t runNumber,
     const std::string &broker, const std::string &runCycle)
     : m_jobID(instrumentName + "_" + std::to_string(runNumber)),
-      m_instrumentName(instrumentName) {
-  const std::string filename =
-      instrumentName + "_" + std::to_string(runNumber) + ".nxs";
-  initStartMessageJson(broker, filename, instrumentName);
+      m_instrumentName(instrumentName), m_broker(broker),
+      m_filename(instrumentName + "_" + std::to_string(runNumber) + ".nxs") {
+  initEntryGroupJson();
+  initIsisVmsCompat();
   addRunCycle(runCycle);
   addRunNumber(runNumber);
   addInstrument(instrumentName);
@@ -33,64 +33,55 @@ void NexusWriteCommandBuilder::addStartTime(
   auto dataset =
       createDataset<std::string>("start_time", "string", startTimeIso8601,
                                  {Attribute{"units", "ISO8601"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addEndTime(const std::string &endTimeIso8601) {
   auto dataset = createDataset<std::string>(
       "end_time", "string", endTimeIso8601, {Attribute{"units", "ISO8601"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addTitle(const std::string &title) {
   auto dataset = createDataset<std::string>("title", "string", title);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addTotalCounts(const uint64_t totalCounts) {
   auto dataset = createDataset<uint64_t>("total_counts", "uint64", totalCounts);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addMonitorEventsNotSaved(
     const int64_t monitorEventsNotSaved) {
   auto dataset = createDataset<int64_t>("monitor_events_not_saved", "int64",
                                         monitorEventsNotSaved);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addTotalUncountedCounts(
     const int32_t uncountedCounts) {
   auto dataset = createDataset<int32_t>("total_uncounted_counts", "int32",
                                         uncountedCounts);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addRunNumber(const int32_t runNumber) {
   auto dataset = createDataset<int32_t>("run_number", "int32", runNumber);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addSeciConfig(const std::string &SeciConfig) {
   auto dataset =
       createDataset<std::string>("seci_config", "string", SeciConfig);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addProgramName(const std::string &programName,
                                               const std::string &version) {
   auto dataset = createDataset<std::string>(
       "program_name", "string", programName, {{"version", version}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addNexusDefinition(const std::string &name,
@@ -98,8 +89,7 @@ void NexusWriteCommandBuilder::addNexusDefinition(const std::string &name,
                                                   const std::string &url) {
   auto dataset = createDataset<std::string>(
       "definition", "string", name, {{"version", version}, {"url", url}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addLocalNexusDefinition(
@@ -107,30 +97,26 @@ void NexusWriteCommandBuilder::addLocalNexusDefinition(
     const std::string &url) {
   auto dataset = createDataset<std::string>(
       "definition_local", "string", name, {{"version", version}, {"url", url}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addNotes(const std::string &notes) {
   auto dataset = createDataset<std::string>("notes", "string", notes);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addProtonChargeRawInMicroAmpHours(
     float protonCharge) {
   auto dataset = createDataset<float>("proton_charge_raw", "float",
                                       protonCharge, {{"units", "uAh"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addProtonChargeInMicroAmpHours(
     float protonCharge) {
   auto dataset = createDataset<float>("proton_charge", "float", protonCharge,
                                       {{"units", "uAh"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addCollectionTime(
@@ -138,15 +124,13 @@ void NexusWriteCommandBuilder::addCollectionTime(
   auto dataset =
       createDataset<float>("collection_time", "float", collectionTimeInSeconds,
                            {{"units", "second"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addDuration(float durationInSeconds) {
   auto dataset = createDataset<float>("duration", "float", durationInSeconds,
                                       {{"units", "second"}});
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      dataset);
+  m_entryGroupJson["children"].push_back(dataset);
 }
 
 void NexusWriteCommandBuilder::addUser(const std::string &name,
@@ -158,8 +142,7 @@ void NexusWriteCommandBuilder::addUser(const std::string &name,
   userGroup["children"].push_back(
       createDataset("affiliation", "string", affiliation));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      userGroup);
+  m_entryGroupJson["children"].push_back(userGroup);
 }
 
 void NexusWriteCommandBuilder::addDetector(uint32_t detectorNumber,
@@ -170,8 +153,7 @@ void NexusWriteCommandBuilder::addDetector(uint32_t detectorNumber,
       "source_detector_distance", "float", sourceDetectorDistance));
   detectorGroup["children"].push_back(createGroup("period_index"));
 
-  for (auto &node :
-       m_startMessageJson["nexus_structure"]["children"][0]["children"]) {
+  for (auto &node : m_entryGroupJson["children"]) {
     if (node["name"] == "instrument") {
       node["children"].push_back(detectorGroup);
     }
@@ -196,17 +178,16 @@ void NexusWriteCommandBuilder::addMeasurement(const std::string &label,
   measurementGroup["children"].push_back(
       createDataset<int32_t>("label", "int32", firstRun));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      measurementGroup);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(measurementGroup);
+  m_entryGroupJson["children"].push_back(
       createDataset<std::string>("measurement_label", "string", label));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset<std::string>("measurement_id", "string", id));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset<std::string>("measurement_subid", "string", subId));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset<std::string>("measurement_type", "string", type));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset<int32_t>("measurement_first_run", "int32", firstRun));
 }
 
@@ -230,8 +211,7 @@ void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
                                std::to_string(detectorNumber) + "_events",
                    sourceName, m_instrumentName + "_events");
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      eventDataStream);
+  m_entryGroupJson["children"].push_back(eventDataStream);
 }
 
 void NexusWriteCommandBuilder::addSELogData(
@@ -244,8 +224,7 @@ void NexusWriteCommandBuilder::addSELogData(
     selogGroup["children"].push_back(createStream(
         "f142", "/raw_data_1/selog/" + splitPV.back(), pv, topicName));
   }
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      selogGroup);
+  m_entryGroupJson["children"].push_back(selogGroup);
 }
 
 void NexusWriteCommandBuilder::addPeriods(
@@ -285,121 +264,85 @@ void NexusWriteCommandBuilder::addPeriods(
   periodsGroup["children"].push_back(
       createDataset<int32_t>("raw_frames", "int32", rawFrames));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      periodsGroup);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(periodsGroup);
+  m_entryGroupJson["children"].push_back(
       createDataset<int32_t>("good_frames", "int32", goodFrames));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset<int32_t>("raw_frames", "int32", rawFrames));
 }
 
 void NexusWriteCommandBuilder::addExperimentIdentifier(
     const std::string &experimentIdentifier) {
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset("experiment_identifier", "string", experimentIdentifier));
 }
 
 void NexusWriteCommandBuilder::addScriptName(const std::string &scriptName) {
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+  m_entryGroupJson["children"].push_back(
       createDataset("script_name", "string", scriptName));
 }
 
-void NexusWriteCommandBuilder::initStartMessageJson(
-    const std::string &broker, const std::string &filename,
-    const std::string &instrumentName) {
+void NexusWriteCommandBuilder::initIsisVmsCompat() {
+  m_isisVmsCompatJson = createGroup("isis_vms_compat", {{"NX_class", "IXvms"}});
+}
+
+void NexusWriteCommandBuilder::initEntryGroupJson() {
   // clang-format off
-  json nexusStructure = R"({
+  m_entryGroupJson = R"({
+    "attributes": [
+      {
+        "name": "NX_class",
+        "values": "NXentry"
+      }
+    ],
     "children": [
       {
         "attributes": [
           {
             "name": "NX_class",
-            "values": "NXentry"
+            "values": "IXrunlog"
           }
         ],
         "children": [
           {
-            "attributes": [
-              {
-                "name": "NX_class",
-                "values": "IXrunlog"
-              }
-            ],
-            "children": [
-              {
-                "stream": {
-                  "writer_module": "f142",
-                  "nexus_path": "/raw_data_1/runlog",
-                  "source": "MUST MATCH SOURCE NAME SET IN ICP",
-                  "topic": "INSTR_runlog"
-                },
-                "type": "stream"
-              }
-            ],
-            "type": "group",
-            "name": "runlog"
-          },
-          {
-            "attributes": [
-              {
-                "name": "NX_class",
-                "values": "IXvms"
-              }
-            ],
-            "children": [
-              {
-                "stream": {
-                  "writer_module": "AAAAA",
-                  "nexus_path": "/raw_data_1/isis_vms_compat",
-                  "type": "AAAAA",
-                  "source": "AAAAA",
-                  "topic": "AAAAA"
-                },
-                "type": "stream"
-              }
-            ],
-            "type": "group",
-            "name": "isis_vms_compat"
-          },
-          {
-            "attributes": [
-              {
-                "name": "NX_class",
-                "values": "NXcollection"
-              }
-            ],
-            "children": [
-              {
-                "stream": {
-                  "writer_module": "f142",
-                  "nexus_path": "/raw_data_1/runlog",
-                  "source": "MUST MATCH SOURCE NAME SET IN ICP",
-                  "topic": "INSTR_framelog"
-                },
-                "type": "stream"
-              }
-            ],
-            "type": "group",
-            "name": "framelog"
+            "stream": {
+              "writer_module": "f142",
+              "nexus_path": "/raw_data_1/runlog",
+              "source": "MUST MATCH SOURCE NAME SET IN ICP",
+              "topic": "INSTR_runlog"
+            },
+            "type": "stream"
           }
         ],
         "type": "group",
-        "name": "raw_data_1"
+        "name": "runlog"
+      },
+      {
+        "attributes": [
+          {
+            "name": "NX_class",
+            "values": "NXcollection"
+          }
+        ],
+        "children": [
+          {
+            "stream": {
+              "writer_module": "f142",
+              "nexus_path": "/raw_data_1/runlog",
+              "source": "MUST MATCH SOURCE NAME SET IN ICP",
+              "topic": "INSTR_framelog"
+            },
+            "type": "stream"
+          }
+        ],
+        "type": "group",
+        "name": "framelog"
       }
-    ]
+    ],
+    "type": "group",
+    "name": "raw_data_1"
   })"_json;
   // clang-format on
-
-  m_startMessageJson = {{"cmd", "FileWriter_new"},
-                        {"broker", broker},
-                        {"job_id", m_jobID},
-                        {"nexus_structure", nexusStructure},
-                        {"file_attributes", {"file_name", filename}}};
-
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      createInstrumentNameJson(instrumentName));
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      createBeamlineJson(instrumentName));
 }
 
 json NexusWriteCommandBuilder::createBeamlineJson(
@@ -410,8 +353,7 @@ json NexusWriteCommandBuilder::createBeamlineJson(
 void NexusWriteCommandBuilder::addRunCycle(const std::string &runCycleStr) {
   auto runCycle =
       createDataset<std::string>("run_cycle", "string", runCycleStr);
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      runCycle);
+  m_entryGroupJson["children"].push_back(runCycle);
 }
 
 void NexusWriteCommandBuilder::addSample(float height, float thickness,
@@ -439,8 +381,7 @@ void NexusWriteCommandBuilder::addSample(float height, float thickness,
   sampleGroup["children"].push_back(
       createDataset<std::string>("id", "string", id));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      sampleGroup);
+  m_entryGroupJson["children"].push_back(sampleGroup);
 }
 
 json NexusWriteCommandBuilder::createNode(
@@ -512,8 +453,7 @@ void NexusWriteCommandBuilder::addInstrument(
   instrumentGroup["children"].push_back(
       createInstrumentNameJson(instrumentNameStr));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      instrumentGroup);
+  m_entryGroupJson["children"].push_back(instrumentGroup);
 }
 
 json NexusWriteCommandBuilder::createInstrumentNameJson(
@@ -534,12 +474,25 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
       createDataset<int32_t>("spectrum_index", "int32", spectrumIndex));
   monitorGroup["children"].push_back(createGroup("period_index"));
 
-  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
-      monitorGroup);
+  m_entryGroupJson["children"].push_back(monitorGroup);
 }
 
 std::string NexusWriteCommandBuilder::startMessageAsString() {
-  return m_startMessageJson.dump(4);
+  json nexusStructureJson = {{"children", json::array()}};
+  nexusStructureJson["children"].push_back(m_entryGroupJson);
+  json startMessageJson = {{"cmd", "FileWriter_new"},
+                           {"broker", m_broker},
+                           {"job_id", m_jobID},
+                           {"nexus_structure", nexusStructureJson},
+                           {"file_attributes", {"file_name", m_filename}}};
+
+  startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createInstrumentNameJson(m_instrumentName));
+  startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createBeamlineJson(m_instrumentName));
+  startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      m_isisVmsCompatJson);
+  return startMessageJson.dump(4);
 }
 
 std::string NexusWriteCommandBuilder::stopMessageAsString() {
