@@ -61,6 +61,13 @@ int main() {
     commandBuilder.addMonitor(monitorNumber, spectrumNumber);
   }
 
+  // Add some VMS compat records
+  commandBuilder.addVmsRecord<std::string>(
+      "HDR", "string", "ZOO04112                    MT Beam A2=6mm SANS "
+                       "    06-JUL-2018 09:47:44   20.06");
+  commandBuilder.addVmsRecord<std::vector<int32_t>>("CRAT", "int32",
+                                                    {0, 1, 1, 0, 0, 1, 0});
+
   // The returned string can be used directly as a Kafka message payload
   std::cout << commandBuilder.startMessageAsString() << std::endl;
   std::cout << commandBuilder.stopMessageAsString() << std::endl;

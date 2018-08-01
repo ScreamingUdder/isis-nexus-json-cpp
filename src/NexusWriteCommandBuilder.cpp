@@ -328,7 +328,7 @@ void NexusWriteCommandBuilder::initEntryGroupJson() {
           {
             "stream": {
               "writer_module": "f142",
-              "nexus_path": "/raw_data_1/runlog",
+              "nexus_path": "/raw_data_1/framelog",
               "source": "MUST MATCH SOURCE NAME SET IN ICP",
               "topic": "INSTR_framelog"
             },
@@ -382,47 +382,6 @@ void NexusWriteCommandBuilder::addSample(float height, float thickness,
       createDataset<std::string>("id", "string", id));
 
   m_entryGroupJson["children"].push_back(sampleGroup);
-}
-
-json NexusWriteCommandBuilder::createNode(
-    const std::string &name, const NodeType nodeType,
-    const std::vector<Attribute> &attributes) const {
-  auto node = json::object();
-
-  node["name"] = name;
-
-  if (nodeType == NodeType::DATASET) {
-    node["type"] = "dataset";
-  } else if (nodeType == NodeType::GROUP) {
-    node["type"] = "group";
-    node["children"] = json::array();
-  } else {
-    throw std::runtime_error(
-        "Unhandled NodeType in NexusWriteCommandBuilder::createNode()");
-  }
-
-  if (!attributes.empty()) {
-    node["attributes"] = {};
-    for (const auto &attribute : attributes) {
-      node["attributes"].push_back(
-          {{"name", attribute.name}, {"values", attribute.value}});
-    }
-  }
-
-  return node;
-}
-
-template <typename T>
-json NexusWriteCommandBuilder::createDataset(
-    const std::string &name, const std::string &typeStr, T value,
-    const std::vector<Attribute> &attributes) {
-  auto dataset = createNode(name, NodeType::DATASET, attributes);
-  std::stringstream strStream;
-  strStream << value;
-  dataset["values"] = strStream.str();
-  dataset["dataset"] = {"type", typeStr};
-
-  return dataset;
 }
 
 json NexusWriteCommandBuilder::createGroup(

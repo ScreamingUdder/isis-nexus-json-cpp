@@ -10,6 +10,32 @@ struct Attribute {
 };
 
 enum class NodeType { DATASET, GROUP };
+
+nlohmann::json createNode(const std::string &name, const NodeType nodeType,
+                          const std::vector<Attribute> &attributes) {
+  auto node = nlohmann::json::object();
+
+  node["name"] = name;
+
+  if (nodeType == NodeType::DATASET) {
+    node["type"] = "dataset";
+  } else if (nodeType == NodeType::GROUP) {
+    node["type"] = "group";
+    node["children"] = nlohmann::json::array();
+  } else {
+    throw std::runtime_error("Unhandled NodeType in createNode");
+  }
+
+  if (!attributes.empty()) {
+    node["attributes"] = {};
+    for (const auto &attribute : attributes) {
+      node["attributes"].push_back(
+          {{"name", attribute.name}, {"values", attribute.value}});
+    }
+  }
+
+  return node;
+}
 }
 
 class NexusWriteCommandBuilder {
@@ -63,6 +89,13 @@ public:
   void addExperimentIdentifier(const std::string &experimentIdentifier);
   void addScriptName(const std::string &scriptName);
 
+  template <typename T>
+  void addVmsRecord(const std::string &name, const std::string &typeStr,
+                    T record) {
+    m_isisVmsCompatJson["children"].push_back(
+        createDataset<T>(name, typeStr, record));
+  }
+
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
 
@@ -76,13 +109,16 @@ private:
   template <typename T>
   nlohmann::json createDataset(const std::string &name,
                                const std::string &typeStr, T value,
-                               const std::vector<Attribute> &attributes = {});
+                               const std::vector<Attribute> &attributes = {}) {
+    auto dataset = createNode(name, NodeType::DATASET, attributes);
+    dataset["values"] = value;
+    dataset["dataset"] = {"type", typeStr};
+
+    return dataset;
+  }
 
   nlohmann::json createGroup(const std::string &name,
                              const std::vector<Attribute> &attributes = {});
-
-  nlohmann::json createNode(const std::string &name, NodeType nodeType,
-                            const std::vector<Attribute> &attributes) const;
 
   nlohmann::json createStream(const std::string &module,
                               const std::string &nexusPath,
