@@ -50,6 +50,8 @@ int main() {
                             1, 0, 18234, 1, 1, "Period 1", 20.061872482299805f,
                             1, 18234);
 
+  commandBuilder.addExperimentIdentifier("0");
+
   // TODO Add frameLog
 
   // Add 8 monitors (with 1:1 mapping of monitor and spectrum numbers)

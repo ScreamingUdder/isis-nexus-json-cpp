@@ -287,6 +287,16 @@ void NexusWriteCommandBuilder::addPeriods(
 
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       periodsGroup);
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<int32_t>("good_frames", "int32", goodFrames));
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset<int32_t>("raw_frames", "int32", rawFrames));
+}
+
+void NexusWriteCommandBuilder::addExperimentIdentifier(
+    const std::string &experimentIdentifier) {
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset("experiment_identifier", "string", experimentIdentifier));
 }
 
 void NexusWriteCommandBuilder::initStartMessageJson(
@@ -309,32 +319,8 @@ void NexusWriteCommandBuilder::initStartMessageJson(
                 "type": "string"
               },
               "type": "dataset",
-              "name": "experiment_identifier",
-              "values": "0"
-            },
-            {
-              "dataset": {
-                "type": "int32"
-              },
-              "type": "dataset",
-              "name": "good_frames",
-              "values": 18234
-            },
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
               "name": "script_name",
               "values": " "
-            },
-            {
-              "dataset": {
-                "type": "int32"
-              },
-              "type": "dataset",
-              "name": "raw_frames",
-              "values": 18234
             },
             {
               "attributes": [
