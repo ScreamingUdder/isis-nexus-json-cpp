@@ -308,93 +308,93 @@ void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
   // clang-format off
-  m_startMessageJson = R"({
-    "nexus_structure": {
-      "children": [
-        {
-          "attributes": [
-            {
-              "name": "NX_class",
-              "values": "NXentry"
-            }
-          ],
-          "children": [
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "IXrunlog"
-                }
-              ],
-              "children": [
-                {
-                  "stream": {
-                    "writer_module": "f142",
-                    "nexus_path": "/raw_data_1/runlog",
-                    "source": "MUST MATCH SOURCE NAME SET IN ICP",
-                    "topic": "INSTR_runlog"
-                  },
-                  "type": "stream"
-                }
-              ],
-              "type": "group",
-              "name": "runlog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "IXvms"
-                }
-              ],
-              "children": [
-                {
-                  "stream": {
-                    "writer_module": "AAAAA",
-                    "nexus_path": "/raw_data_1/isis_vms_compat",
-                    "type": "AAAAA",
-                    "source": "AAAAA",
-                    "topic": "AAAAA"
-                  },
-                  "type": "stream"
-                }
-              ],
-              "type": "group",
-              "name": "isis_vms_compat"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "NXcollection"
-                }
-              ],
-              "children": [
-                {
-                  "stream": {
-                    "writer_module": "f142",
-                    "nexus_path": "/raw_data_1/runlog",
-                    "source": "MUST MATCH SOURCE NAME SET IN ICP",
-                    "topic": "INSTR_framelog"
-                  },
-                  "type": "stream"
-                }
-              ],
-              "type": "group",
-              "name": "framelog"
-            }
-          ],
-          "type": "group",
-          "name": "raw_data_1"
-        }
-      ]
-    },
-    "cmd": "FileWriter_new"
+  json nexusStructure = R"({
+    "children": [
+      {
+        "attributes": [
+          {
+            "name": "NX_class",
+            "values": "NXentry"
+          }
+        ],
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "NX_class",
+                "values": "IXrunlog"
+              }
+            ],
+            "children": [
+              {
+                "stream": {
+                  "writer_module": "f142",
+                  "nexus_path": "/raw_data_1/runlog",
+                  "source": "MUST MATCH SOURCE NAME SET IN ICP",
+                  "topic": "INSTR_runlog"
+                },
+                "type": "stream"
+              }
+            ],
+            "type": "group",
+            "name": "runlog"
+          },
+          {
+            "attributes": [
+              {
+                "name": "NX_class",
+                "values": "IXvms"
+              }
+            ],
+            "children": [
+              {
+                "stream": {
+                  "writer_module": "AAAAA",
+                  "nexus_path": "/raw_data_1/isis_vms_compat",
+                  "type": "AAAAA",
+                  "source": "AAAAA",
+                  "topic": "AAAAA"
+                },
+                "type": "stream"
+              }
+            ],
+            "type": "group",
+            "name": "isis_vms_compat"
+          },
+          {
+            "attributes": [
+              {
+                "name": "NX_class",
+                "values": "NXcollection"
+              }
+            ],
+            "children": [
+              {
+                "stream": {
+                  "writer_module": "f142",
+                  "nexus_path": "/raw_data_1/runlog",
+                  "source": "MUST MATCH SOURCE NAME SET IN ICP",
+                  "topic": "INSTR_framelog"
+                },
+                "type": "stream"
+              }
+            ],
+            "type": "group",
+            "name": "framelog"
+          }
+        ],
+        "type": "group",
+        "name": "raw_data_1"
+      }
+    ]
   })"_json;
   // clang-format on
-  m_startMessageJson["broker"] = broker;
-  m_startMessageJson["job_id"] = m_jobID;
-  m_startMessageJson["file_attributes"] = {"file_name", filename};
+
+  m_startMessageJson = {{"cmd", "FileWriter_new"},
+                        {"broker", broker},
+                        {"job_id", m_jobID},
+                        {"nexus_structure", nexusStructure},
+                        {"file_attributes", {"file_name", filename}}};
 
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       createInstrumentNameJson(instrumentName));
