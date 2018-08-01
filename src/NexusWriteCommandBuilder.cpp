@@ -248,6 +248,47 @@ void NexusWriteCommandBuilder::addSELogData(
       selogGroup);
 }
 
+void NexusWriteCommandBuilder::addPeriods(
+    int32_t output, float totalCountsInMegaElectronVolts,
+    float protonChargeInMicroAmpHours, int32_t goodFramesDaq, int32_t sequences,
+    int32_t framesRequested, int32_t goodFrames, int32_t number,
+    int32_t highestUsed, const std::string &labels,
+    float protonChargeRawInMicroAmpHours, int32_t type, int32_t rawFrames) {
+  auto periodsGroup = createGroup("periods", {{"NX_class", "IXperiods"}});
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("output", "int32", output));
+  periodsGroup["children"].push_back(
+      createDataset<float>("total_counts", "int32",
+                           totalCountsInMegaElectronVolts, {{"units", "Mev"}}));
+  periodsGroup["children"].push_back(
+      createDataset<float>("proton_charge", "float",
+                           protonChargeInMicroAmpHours, {{"units", "uAh"}}));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("good_frames_daq", "int32", goodFramesDaq));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("sequences", "int32", sequences));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("frames_requested", "int32", framesRequested));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("good_frames", "int32", goodFrames));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("number", "int32", number));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("highest_used", "int32", highestUsed));
+  periodsGroup["children"].push_back(
+      createDataset<std::string>("output", "string", labels));
+  periodsGroup["children"].push_back(
+      createDataset<float>("proton_charge_raw", "float",
+                           protonChargeRawInMicroAmpHours, {{"units", "uAh"}}));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("type", "int32", type));
+  periodsGroup["children"].push_back(
+      createDataset<int32_t>("raw_frames", "int32", rawFrames));
+
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      periodsGroup);
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -358,140 +399,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
               ],
               "type": "group",
               "name": "framelog"
-            },
-            {
-              "attributes": [
-                {
-                  "name": "NX_class",
-                  "values": "IXperiods"
-                }
-              ],
-              "children": [
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "output",
-                  "values": 0
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "units",
-                      "values": "Mev"
-                    }
-                  ],
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "total_counts",
-                  "values": 21.20301055908203
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "units",
-                      "values": "uAh"
-                    }
-                  ],
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "proton_charge",
-                  "values": 20.061872482299805
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "good_frames_daq",
-                  "values": 18234
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "sequences",
-                  "values": 1
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "frames_requested",
-                  "values": 0
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "good_frames",
-                  "values": 18234
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "number",
-                  "values": 1
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "highest_used",
-                  "values": 1
-                },
-                {
-                  "dataset": {
-                    "type": "string"
-                  },
-                  "type": "dataset",
-                  "name": "labels",
-                  "values": "Period 1"
-                },
-                {
-                  "attributes": [
-                    {
-                      "name": "units",
-                      "values": "uAh"
-                    }
-                  ],
-                  "dataset": {
-                    "type": "float"
-                  },
-                  "type": "dataset",
-                  "name": "proton_charge_raw",
-                  "values": 20.061872482299805
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "type",
-                  "values": 1
-                },
-                {
-                  "dataset": {
-                    "type": "int32"
-                  },
-                  "type": "dataset",
-                  "name": "raw_frames",
-                  "values": 18234
-                }
-              ],
-              "type": "group",
-              "name": "periods"
             }
           ],
           "type": "group",

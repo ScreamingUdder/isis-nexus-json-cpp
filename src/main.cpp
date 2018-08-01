@@ -30,8 +30,8 @@ int main() {
   commandBuilder.addLocalNexusDefinition(
       "ISISTOFRAW", "1.0",
       "http://svn.isis.rl.ac.uk/instruments/ISISTOFRAW?version=1.0");
-  commandBuilder.addProtonChargeRawInMicroAmpHours(20.061872482299805);
-  commandBuilder.addProtonChargeInMicroAmpHours(20.061872482299805);
+  commandBuilder.addProtonChargeRawInMicroAmpHours(20.061872482299805f);
+  commandBuilder.addProtonChargeInMicroAmpHours(20.061872482299805f);
   commandBuilder.addSeciConfig(" ");
   commandBuilder.addNotes(" ");
 
@@ -46,10 +46,13 @@ int main() {
 
   commandBuilder.addSELogData({"full:pv:name", "bar:foo", "foo:bar"});
 
-  // TODO Add periodLog
-  // TODO Add seLog (take vector of PV names)
+  commandBuilder.addPeriods(0, 21.20301055908203f, 20.061872482299805f, 18234,
+                            1, 0, 18234, 1, 1, "Period 1", 20.061872482299805f,
+                            1, 18234);
 
-  // Add 8 monitors
+  // TODO Add frameLog
+
+  // Add 8 monitors (with 1:1 mapping of monitor and spectrum numbers)
   for (uint32_t monitorNumber = 1; monitorNumber <= 8; monitorNumber++) {
     auto spectrumNumber = monitorNumber;
     commandBuilder.addMonitor(monitorNumber, spectrumNumber);

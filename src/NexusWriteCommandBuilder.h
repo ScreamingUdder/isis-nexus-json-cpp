@@ -53,6 +53,13 @@ public:
   void addNotes(const std::string &notes);
   void addProtonChargeRawInMicroAmpHours(float protonCharge);
   void addProtonChargeInMicroAmpHours(float protonCharge);
+  void addPeriods(int32_t output, float totalCountsInMegaElectronVolts,
+                  float protonChargeInMicroAmpHours, int32_t goodFramesDaq,
+                  int32_t sequences, int32_t framesRequested,
+                  int32_t goodFrames, int32_t number, int32_t highestUsed,
+                  const std::string &labels,
+                  float protonChargeRawInMicroAmpHours, int32_t type,
+                  int32_t rawFrames);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
@@ -76,12 +83,12 @@ private:
   nlohmann::json createNode(const std::string &name, NodeType nodeType,
                             const std::vector<Attribute> &attributes) const;
 
-  nlohmann::json
-  createStream(const std::string &module, const std::string &nexusPath,
-               const std::string &source, const std::string &topic) const;
+  nlohmann::json createStream(const std::string &module,
+                              const std::string &nexusPath,
+                              const std::string &source,
+                              const std::string &topic) const;
 
-      nlohmann::json
-      createInstrumentNameJson(const std::string &instrumentNameStr);
+  nlohmann::json createInstrumentNameJson(const std::string &instrumentNameStr);
   nlohmann::json createBeamlineJson(const std::string &beamlineName);
 
   const std::string m_jobID;
