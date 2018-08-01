@@ -23,7 +23,6 @@ public:
   std::string stopMessageAsString();
 
   // Add stuff to the file
-  void addSampleEnvLog(const std::string &name);
   void addMonitor(uint32_t monitorNumber, uint32_t spectrumNumber);
   void addSample(float height, float thickness, float width,
                  double distance = 0.0, const std::string &shape = "",
@@ -43,7 +42,7 @@ public:
                       const std::string &subId = "",
                       const std::string &type = "", int32_t firstRun = 0);
   void addEventData(uint32_t detectorNumber, const std::string &sourceName);
-  void addSELogData(const std::vector<std::pair<std::string, std::string>> &pVs);
+  void addSELogData(const std::vector<std::string> &pVs);
   void addProgramName(const std::string &programName,
                       const std::string &version);
   void addNexusDefinition(const std::string &name, const std::string &version,

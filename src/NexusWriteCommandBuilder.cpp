@@ -2,6 +2,19 @@
 
 using json = nlohmann::json;
 
+namespace {
+
+std::vector<std::string> split(const std::string &s, char delimiter) {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(s);
+  while (std::getline(tokenStream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
+}
+
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const int32_t runNumber,
     const std::string &broker, const std::string &runCycle)
@@ -222,13 +235,14 @@ void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
 }
 
 void NexusWriteCommandBuilder::addSELogData(
-    const std::vector<std::pair<std::string, std::string>> &pVs) {
+    const std::vector<std::string> &pVs) {
   const std::string topicName = m_instrumentName + "_sampleEnv";
   auto selogGroup = createGroup("selog", {{"NX_class", "IXselog"}});
 
   for (const auto &pv : pVs) {
+    auto splitPV = split(pv, ':');
     selogGroup["children"].push_back(createStream(
-        "f142", "/raw_data_1/selog/" + pv.second, pv.first, topicName));
+        "f142", "/raw_data_1/selog/" + splitPV.back(), pv, topicName));
   }
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       selogGroup);
@@ -633,8 +647,6 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
   m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       monitorGroup);
 }
-
-void NexusWriteCommandBuilder::addSampleEnvLog(const std::string &name) {}
 
 std::string NexusWriteCommandBuilder::startMessageAsString() {
   return m_startMessageJson.dump(4);

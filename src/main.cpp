@@ -44,8 +44,7 @@ int main() {
   // source name in event data messages it produces
   commandBuilder.addEventData(1, "ICP");
 
-  commandBuilder.addSELogData(
-      {{"full::pv::name", "blockname"}, {"bar::bar", "bar"}, {"foo::bar", "bar"}});
+  commandBuilder.addSELogData({"full:pv:name", "bar:foo", "foo:bar"});
 
   // TODO Add periodLog
   // TODO Add seLog (take vector of PV names)
