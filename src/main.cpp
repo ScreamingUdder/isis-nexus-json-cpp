@@ -51,6 +51,7 @@ int main() {
                             1, 18234);
 
   commandBuilder.addExperimentIdentifier("0");
+  commandBuilder.addScriptName(" ");
 
   // TODO Add frameLog
 

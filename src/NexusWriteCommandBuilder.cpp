@@ -299,6 +299,11 @@ void NexusWriteCommandBuilder::addExperimentIdentifier(
       createDataset("experiment_identifier", "string", experimentIdentifier));
 }
 
+void NexusWriteCommandBuilder::addScriptName(const std::string &scriptName) {
+  m_startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      createDataset("script_name", "string", scriptName));
+}
+
 void NexusWriteCommandBuilder::initStartMessageJson(
     const std::string &broker, const std::string &filename,
     const std::string &instrumentName) {
@@ -314,14 +319,6 @@ void NexusWriteCommandBuilder::initStartMessageJson(
             }
           ],
           "children": [
-            {
-              "dataset": {
-                "type": "string"
-              },
-              "type": "dataset",
-              "name": "script_name",
-              "values": " "
-            },
             {
               "attributes": [
                 {

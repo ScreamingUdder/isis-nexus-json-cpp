@@ -61,6 +61,7 @@ public:
                   float protonChargeRawInMicroAmpHours, int32_t type,
                   int32_t rawFrames);
   void addExperimentIdentifier(const std::string &experimentIdentifier);
+  void addScriptName(const std::string &scriptName);
 
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
