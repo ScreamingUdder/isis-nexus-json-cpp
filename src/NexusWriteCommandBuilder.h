@@ -67,8 +67,9 @@ public:
   void addMeasurement(const std::string &label = "", const std::string &id = "",
                       const std::string &subId = "",
                       const std::string &type = "", int32_t firstRun = 0);
-  void addEventData(uint32_t detectorNumber, const std::string &sourceName);
-  void addSELogData(const std::vector<std::string> &pVs);
+  void addEventDataSource(uint32_t detectorNumber,
+                          const std::string &sourceName);
+  void addSELogSources(const std::vector<std::string> &pVs);
   void addProgramName(const std::string &programName,
                       const std::string &version);
   void addNexusDefinition(const std::string &name, const std::string &version,
@@ -96,6 +97,20 @@ public:
         createDataset<T>(name, typeStr, record));
   }
 
+  template <typename T>
+  void addRunlogRecord(const std::string &name, const std::string &typeStr,
+                       const std::vector<T> &values, const std::string &units,
+                       const std::vector<float> &times,
+                       const std::string &startTime) {
+    auto logGroup = createGroup(name, {{"NX_class", "NXlog"}});
+    logGroup["children"].push_back(createDataset<std::vector<float>>(
+        "time", "float", times, {{"start", startTime}, {"units", "second"}}));
+    logGroup["children"].push_back(createDataset<std::vector<T>>(
+        "value", typeStr, values, {{"units", units}}));
+
+    m_runlogJson["children"].push_back(logGroup);
+  }
+
   // Can be called multiple times to add more users
   void addUser(const std::string &name, const std::string &affiliation);
 
@@ -105,6 +120,8 @@ private:
   void addRunCycle(const std::string &runCycleStr);
   void addRunNumber(int32_t runNumber);
   void initIsisVmsCompat();
+  void initFramelog();
+  void initRunlog();
 
   template <typename T>
   nlohmann::json createDataset(const std::string &name,
@@ -118,7 +135,9 @@ private:
   }
 
   nlohmann::json createGroup(const std::string &name,
-                             const std::vector<Attribute> &attributes = {});
+                             const std::vector<Attribute> &attributes = {}) {
+    return createNode(name, NodeType::GROUP, attributes);
+  }
 
   nlohmann::json createStream(const std::string &module,
                               const std::string &nexusPath,
@@ -134,5 +153,7 @@ private:
   const std::string m_filename;
   nlohmann::json m_entryGroupJson;
   nlohmann::json m_isisVmsCompatJson;
+  nlohmann::json m_framelogJson;
+  nlohmann::json m_runlogJson;
   uint32_t m_numberOfUsers = 0;
 };

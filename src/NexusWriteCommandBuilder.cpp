@@ -23,6 +23,8 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
       m_filename(instrumentName + "_" + std::to_string(runNumber) + ".nxs") {
   initEntryGroupJson();
   initIsisVmsCompat();
+  initRunlog();
+  initFramelog();
   addRunCycle(runCycle);
   addRunNumber(runNumber);
   addInstrument(instrumentName);
@@ -204,8 +206,8 @@ json NexusWriteCommandBuilder::createStream(const std::string &module,
   return stream;
 }
 
-void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
-                                            const std::string &sourceName) {
+void NexusWriteCommandBuilder::addEventDataSource(uint32_t detectorNumber,
+                                                  const std::string &sourceName) {
   auto eventDataStream =
       createStream("ev42", "/raw_data_1/detector_" +
                                std::to_string(detectorNumber) + "_events",
@@ -214,7 +216,7 @@ void NexusWriteCommandBuilder::addEventData(uint32_t detectorNumber,
   m_entryGroupJson["children"].push_back(eventDataStream);
 }
 
-void NexusWriteCommandBuilder::addSELogData(
+void NexusWriteCommandBuilder::addSELogSources(
     const std::vector<std::string> &pVs) {
   const std::string topicName = m_instrumentName + "_sampleEnv";
   auto selogGroup = createGroup("selog", {{"NX_class", "IXselog"}});
@@ -286,6 +288,14 @@ void NexusWriteCommandBuilder::initIsisVmsCompat() {
   m_isisVmsCompatJson = createGroup("isis_vms_compat", {{"NX_class", "IXvms"}});
 }
 
+void NexusWriteCommandBuilder::initFramelog() {
+  m_framelogJson = createGroup("framelog", {{"NX_class", "NXcollection"}});
+}
+
+void NexusWriteCommandBuilder::initRunlog() {
+  m_runlogJson = createGroup("runlog", {{"NX_class", "IXrunlog"}});
+}
+
 void NexusWriteCommandBuilder::initEntryGroupJson() {
   // clang-format off
   m_entryGroupJson = R"({
@@ -296,27 +306,6 @@ void NexusWriteCommandBuilder::initEntryGroupJson() {
       }
     ],
     "children": [
-      {
-        "attributes": [
-          {
-            "name": "NX_class",
-            "values": "IXrunlog"
-          }
-        ],
-        "children": [
-          {
-            "stream": {
-              "writer_module": "f142",
-              "nexus_path": "/raw_data_1/runlog",
-              "source": "MUST MATCH SOURCE NAME SET IN ICP",
-              "topic": "INSTR_runlog"
-            },
-            "type": "stream"
-          }
-        ],
-        "type": "group",
-        "name": "runlog"
-      },
       {
         "attributes": [
           {
@@ -384,11 +373,6 @@ void NexusWriteCommandBuilder::addSample(float height, float thickness,
   m_entryGroupJson["children"].push_back(sampleGroup);
 }
 
-json NexusWriteCommandBuilder::createGroup(
-    const std::string &name, const std::vector<Attribute> &attributes) {
-  return createNode(name, NodeType::GROUP, attributes);
-}
-
 void NexusWriteCommandBuilder::addInstrument(
     const std::string &instrumentNameStr) {
 
@@ -451,6 +435,10 @@ std::string NexusWriteCommandBuilder::startMessageAsString() {
       createBeamlineJson(m_instrumentName));
   startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       m_isisVmsCompatJson);
+  startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      m_runlogJson);
+  startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
+      m_framelogJson);
   return startMessageJson.dump(4);
 }
 
