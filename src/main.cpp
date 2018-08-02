@@ -83,6 +83,13 @@ int main() {
   commandBuilder.addRunlogRecord<std::string>(
       "icp_event", "string", "CHANGE_PERIOD 1", times, startTime);
 
+  // Add some framelog records
+  commandBuilder.addFramelogRecord<std::vector<int32_t>>(
+      "events_log", "int32", {11, 8, 6, 12}, times, startTime, "counts");
+  commandBuilder.addFramelogRecord<std::vector<float>>(
+      "proton_charge", "float", {0.001091, 0.001045, 0.001085, 0.001015}, times,
+      startTime, "uAh");
+
   // The returned string can be used directly as a Kafka message payload
   std::cout << commandBuilder.startMessageAsString() << std::endl;
   std::cout << commandBuilder.stopMessageAsString() << std::endl;

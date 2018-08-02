@@ -13,6 +13,8 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
   }
   return tokens;
 }
+
+const std::string entryGroupName = "raw_data_1";
 }
 
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
@@ -206,10 +208,10 @@ json NexusWriteCommandBuilder::createStream(const std::string &module,
   return stream;
 }
 
-void NexusWriteCommandBuilder::addEventDataSource(uint32_t detectorNumber,
-                                                  const std::string &sourceName) {
+void NexusWriteCommandBuilder::addEventDataSource(
+    uint32_t detectorNumber, const std::string &sourceName) {
   auto eventDataStream =
-      createStream("ev42", "/raw_data_1/detector_" +
+      createStream("ev42", "/" + entryGroupName + "/detector_" +
                                std::to_string(detectorNumber) + "_events",
                    sourceName, m_instrumentName + "_events");
 
@@ -223,8 +225,9 @@ void NexusWriteCommandBuilder::addSELogSources(
 
   for (const auto &pv : pVs) {
     auto splitPV = split(pv, ':');
-    selogGroup["children"].push_back(createStream(
-        "f142", "/raw_data_1/selog/" + splitPV.back(), pv, topicName));
+    selogGroup["children"].push_back(
+        createStream("f142", "/" + entryGroupName + "/selog/" + splitPV.back(),
+                     pv, topicName));
   }
   m_entryGroupJson["children"].push_back(selogGroup);
 }
@@ -297,41 +300,7 @@ void NexusWriteCommandBuilder::initRunlog() {
 }
 
 void NexusWriteCommandBuilder::initEntryGroupJson() {
-  // clang-format off
-  m_entryGroupJson = R"({
-    "attributes": [
-      {
-        "name": "NX_class",
-        "values": "NXentry"
-      }
-    ],
-    "children": [
-      {
-        "attributes": [
-          {
-            "name": "NX_class",
-            "values": "NXcollection"
-          }
-        ],
-        "children": [
-          {
-            "stream": {
-              "writer_module": "f142",
-              "nexus_path": "/raw_data_1/framelog",
-              "source": "MUST MATCH SOURCE NAME SET IN ICP",
-              "topic": "INSTR_framelog"
-            },
-            "type": "stream"
-          }
-        ],
-        "type": "group",
-        "name": "framelog"
-      }
-    ],
-    "type": "group",
-    "name": "raw_data_1"
-  })"_json;
-  // clang-format on
+  m_entryGroupJson = createGroup(entryGroupName, {{"NX_class", "NXentry"}});
 }
 
 json NexusWriteCommandBuilder::createBeamlineJson(
