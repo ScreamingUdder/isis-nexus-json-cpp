@@ -70,14 +70,18 @@ int main() {
                                                     {0, 1, 1, 0, 0, 1, 0});
 
   // Add some runlog records
+  // TODO - is this interface convenient? Should we publish to Kafka as f142
+  // instead?
   const std::string startTime = "2018-07-06T09:47:44";
   const std::vector<float> times{-30.0, 12.0, 54.0, 97.0};
-  commandBuilder.addRunlogRecord<float>("count_rate", "float",
-                                        {0.0, 40.8772, 42.2018, 41.6405},
-                                        "counts", times, startTime);
-  commandBuilder.addRunlogRecord<float>("dae_beam_current", "float",
-                                        {0.0, 38.6239, 39.7357, 39.4712}, "uAh",
-                                        times, startTime);
+  commandBuilder.addRunlogRecord<std::vector<float>>(
+      "count_rate", "float", {0.0, 40.8772, 42.2018, 41.6405}, times, startTime,
+      "counts");
+  commandBuilder.addRunlogRecord<std::vector<float>>(
+      "dae_beam_current", "float", {0.0, 38.6239, 39.7357, 39.4712}, times,
+      startTime, "uAh");
+  commandBuilder.addRunlogRecord<std::string>(
+      "icp_event", "string", "CHANGE_PERIOD 1", times, startTime);
 
   // The returned string can be used directly as a Kafka message payload
   std::cout << commandBuilder.startMessageAsString() << std::endl;

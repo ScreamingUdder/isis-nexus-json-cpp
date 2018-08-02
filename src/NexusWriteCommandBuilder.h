@@ -36,6 +36,39 @@ nlohmann::json createNode(const std::string &name, const NodeType nodeType,
 
   return node;
 }
+
+template <typename T>
+nlohmann::json createDataset(const std::string &name,
+                             const std::string &typeStr, T value,
+                             const std::vector<Attribute> &attributes = {}) {
+  auto dataset = createNode(name, NodeType::DATASET, attributes);
+  dataset["values"] = value;
+  dataset["dataset"] = {"type", typeStr};
+
+  return dataset;
+}
+
+nlohmann::json createGroup(const std::string &name,
+                           const std::vector<Attribute> &attributes = {}) {
+  return createNode(name, NodeType::GROUP, attributes);
+}
+
+template <typename T>
+nlohmann::json
+createLogGroup(const std::string &name, const std::string &typeStr,
+               const T &values, const std::vector<float> &times,
+               const std::string &startTime, const std::string &units) {
+  auto logGroup = createGroup(name, {{"NX_class", "NXlog"}});
+  logGroup["children"].push_back(createDataset<std::vector<float>>(
+      "time", "float", times, {{"start", startTime}, {"units", "second"}}));
+  if (!units.empty()) {
+    logGroup["children"].push_back(
+        createDataset<T>("value", typeStr, values, {{"units", units}}));
+  } else {
+    logGroup["children"].push_back(createDataset<T>("value", typeStr, values));
+  }
+  return logGroup;
+}
 }
 
 class NexusWriteCommandBuilder {
@@ -99,16 +132,22 @@ public:
 
   template <typename T>
   void addRunlogRecord(const std::string &name, const std::string &typeStr,
-                       const std::vector<T> &values, const std::string &units,
-                       const std::vector<float> &times,
-                       const std::string &startTime) {
-    auto logGroup = createGroup(name, {{"NX_class", "NXlog"}});
-    logGroup["children"].push_back(createDataset<std::vector<float>>(
-        "time", "float", times, {{"start", startTime}, {"units", "second"}}));
-    logGroup["children"].push_back(createDataset<std::vector<T>>(
-        "value", typeStr, values, {{"units", units}}));
-
+                       const T &values, const std::vector<float> &times,
+                       const std::string &startTime,
+                       const std::string &units = "") {
+    auto logGroup =
+        createLogGroup<T>(name, typeStr, values, times, startTime, units);
     m_runlogJson["children"].push_back(logGroup);
+  }
+
+  template <typename T>
+  void addFramelogRecord(const std::string &name, const std::string &typeStr,
+                         const T &values, const std::vector<float> &times,
+                         const std::string &startTime,
+                         const std::string &units = "") {
+    auto logGroup =
+        createLogGroup<T>(name, typeStr, values, times, startTime, units);
+    m_framelogJson["children"].push_back(logGroup);
   }
 
   // Can be called multiple times to add more users
@@ -122,22 +161,6 @@ private:
   void initIsisVmsCompat();
   void initFramelog();
   void initRunlog();
-
-  template <typename T>
-  nlohmann::json createDataset(const std::string &name,
-                               const std::string &typeStr, T value,
-                               const std::vector<Attribute> &attributes = {}) {
-    auto dataset = createNode(name, NodeType::DATASET, attributes);
-    dataset["values"] = value;
-    dataset["dataset"] = {"type", typeStr};
-
-    return dataset;
-  }
-
-  nlohmann::json createGroup(const std::string &name,
-                             const std::vector<Attribute> &attributes = {}) {
-    return createNode(name, NodeType::GROUP, attributes);
-  }
 
   nlohmann::json createStream(const std::string &module,
                               const std::string &nexusPath,
