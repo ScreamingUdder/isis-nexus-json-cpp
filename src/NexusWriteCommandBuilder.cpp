@@ -414,7 +414,7 @@ std::string NexusWriteCommandBuilder::startMessageAsString() {
       {"use_hdf_swmr", false},
       {"start_time", iso8601ToUnixTimeMilliseconds(m_startTimeIso8601)},
       {"nexus_structure", nexusStructureJson},
-      {"file_attributes", {"file_name", m_filename}}};
+      {"file_attributes", {{"file_name", m_filename}}}};
 
   startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       createInstrumentNameJson(m_instrumentName));
