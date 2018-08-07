@@ -98,7 +98,7 @@ int main() {
   startOut.close();
 
   std::ofstream stopOut("stopMessage.json");
-  stopOut << commandBuilder.startMessageAsString();
+  stopOut << commandBuilder.stopMessageAsString();
   stopOut.close();
 
   return 0;
