@@ -1,4 +1,6 @@
 #include "NexusWriteCommandBuilder.h"
+#include <ctime>
+#include <iomanip>
 
 using json = nlohmann::json;
 
@@ -14,15 +16,28 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
   return tokens;
 }
 
+uint64_t iso8601ToUnixTimeMilliseconds(const std::string &timeIso8601) {
+  std::tm tmb = {};
+  std::istringstream ss(timeIso8601);
+  ss >> std::get_time(&tmb, "%Y-%m-%dT%H:%M:%S");
+#if (defined(_MSC_VER))
+#define timegm _mkgmtime
+#endif
+  auto timeUnix = timegm(&tmb);
+  return static_cast<uint64_t>(timeUnix * 1000);
+}
+
 const std::string entryGroupName = "raw_data_1";
 }
 
 NexusWriteCommandBuilder::NexusWriteCommandBuilder(
     const std::string &instrumentName, const int32_t runNumber,
-    const std::string &broker, const std::string &runCycle)
+    const std::string &broker, const std::string &runCycle,
+    const std::string &startTimeIso8601)
     : m_jobID(instrumentName + "_" + std::to_string(runNumber)),
       m_instrumentName(instrumentName), m_broker(broker),
-      m_filename(instrumentName + "_" + std::to_string(runNumber) + ".nxs") {
+      m_filename(instrumentName + "_" + std::to_string(runNumber) + ".nxs"),
+      m_startTimeIso8601(startTimeIso8601) {
   initEntryGroupJson();
   initIsisVmsCompat();
   initRunlog();
@@ -32,10 +47,9 @@ NexusWriteCommandBuilder::NexusWriteCommandBuilder(
   addInstrument(instrumentName);
 }
 
-void NexusWriteCommandBuilder::addStartTime(
-    const std::string &startTimeIso8601) {
+void NexusWriteCommandBuilder::addStartTime() {
   auto dataset =
-      createDataset<std::string>("start_time", "string", startTimeIso8601,
+      createDataset<std::string>("start_time", "string", m_startTimeIso8601,
                                  {Attribute{"units", "ISO8601"}});
   m_entryGroupJson["children"].push_back(dataset);
 }
@@ -301,6 +315,7 @@ void NexusWriteCommandBuilder::initRunlog() {
 
 void NexusWriteCommandBuilder::initEntryGroupJson() {
   m_entryGroupJson = createGroup(entryGroupName, {{"NX_class", "NXentry"}});
+  addStartTime();
 }
 
 json NexusWriteCommandBuilder::createBeamlineJson(
@@ -392,11 +407,14 @@ void NexusWriteCommandBuilder::addMonitor(uint32_t monitorNumber,
 std::string NexusWriteCommandBuilder::startMessageAsString() {
   json nexusStructureJson = {{"children", json::array()}};
   nexusStructureJson["children"].push_back(m_entryGroupJson);
-  json startMessageJson = {{"cmd", "FileWriter_new"},
-                           {"broker", m_broker},
-                           {"job_id", m_jobID},
-                           {"nexus_structure", nexusStructureJson},
-                           {"file_attributes", {"file_name", m_filename}}};
+  json startMessageJson = {
+      {"cmd", "FileWriter_new"},
+      {"broker", m_broker},
+      {"job_id", m_jobID},
+      {"use_hdf_swmr", false},
+      {"start_time", iso8601ToUnixTimeMilliseconds(m_startTimeIso8601)},
+      {"nexus_structure", nexusStructureJson},
+      {"file_attributes", {"file_name", m_filename}}};
 
   startMessageJson["nexus_structure"]["children"][0]["children"].push_back(
       createInstrumentNameJson(m_instrumentName));

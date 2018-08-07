@@ -9,10 +9,9 @@ int main() {
   const std::string runCycle = "18_2";
 
   NexusWriteCommandBuilder commandBuilder(instrumentName, runNumber, broker,
-                                          runCycle);
+                                          runCycle, "2018-07-06T09:47:44");
 
   commandBuilder.addSample(6.0, 1.0, 6.0);
-  commandBuilder.addStartTime("2018-07-06T09:47:44");
   commandBuilder.addEndTime("2018-07-06T10:18:21");
   commandBuilder.addTitle("MT Beam A2=6mm SANS");
   commandBuilder.addTotalCounts(170700);

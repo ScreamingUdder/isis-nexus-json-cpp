@@ -75,7 +75,8 @@ class NexusWriteCommandBuilder {
 public:
   NexusWriteCommandBuilder(const std::string &instrumentName, int32_t runNumber,
                            const std::string &broker,
-                           const std::string &runCycle);
+                           const std::string &runCycle,
+                           const std::string &startTimeIso8601);
 
   // Get the output command messages as strings
   std::string startMessageAsString();
@@ -87,7 +88,6 @@ public:
                  double distance = 0.0, const std::string &shape = "",
                  const std::string &name = "", const std::string &type = "",
                  const std::string &id = "");
-  void addStartTime(const std::string &startTimeIso8601);
   void addEndTime(const std::string &endTimeIso8601);
   void addCollectionTime(float collectionTimeInSeconds);
   void addDuration(float durationInSeconds);
@@ -158,6 +158,7 @@ private:
   void addInstrument(const std::string &instrumentNameStr);
   void addRunCycle(const std::string &runCycleStr);
   void addRunNumber(int32_t runNumber);
+  void addStartTime();
   void initIsisVmsCompat();
   void initFramelog();
   void initRunlog();
@@ -174,6 +175,7 @@ private:
   const std::string m_instrumentName;
   const std::string m_broker;
   const std::string m_filename;
+  const std::string m_startTimeIso8601;
   nlohmann::json m_entryGroupJson;
   nlohmann::json m_isisVmsCompatJson;
   nlohmann::json m_framelogJson;
