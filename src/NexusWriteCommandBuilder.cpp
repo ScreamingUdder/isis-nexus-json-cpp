@@ -194,7 +194,7 @@ void NexusWriteCommandBuilder::addMeasurement(const std::string &label,
   measurementGroup["children"].push_back(
       createDataset<std::string>("label", "string", label));
   measurementGroup["children"].push_back(
-      createDataset<int32_t>("label", "int32", firstRun));
+      createDataset<int32_t>("first_run", "int32", firstRun));
 
   m_entryGroupJson["children"].push_back(measurementGroup);
   m_entryGroupJson["children"].push_back(
@@ -274,7 +274,7 @@ void NexusWriteCommandBuilder::addPeriods(
   periodsGroup["children"].push_back(
       createDataset<int32_t>("highest_used", "int32", highestUsed));
   periodsGroup["children"].push_back(
-      createDataset<std::string>("output", "string", labels));
+      createDataset<std::string>("labels", "string", labels));
   periodsGroup["children"].push_back(
       createDataset<float>("proton_charge_raw", "float",
                            protonChargeRawInMicroAmpHours, {{"units", "uAh"}}));

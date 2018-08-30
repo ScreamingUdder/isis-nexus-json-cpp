@@ -43,7 +43,7 @@ nlohmann::json createDataset(const std::string &name,
                              const std::vector<Attribute> &attributes = {}) {
   auto dataset = createNode(name, NodeType::DATASET, attributes);
   dataset["values"] = value;
-  dataset["dataset"] = {{"type", typeStr}};
+  dataset["dataset"] = {{"type", typeStr}, {"size", {"unlimited"}}};
 
   return dataset;
 }
